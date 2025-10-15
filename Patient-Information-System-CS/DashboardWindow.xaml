@@ -28,7 +28,7 @@
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="1">
             <TextBlock Text="Available Doctors:" FontWeight="Bold"/>
-            <ListBox x:Name="AvailableDoctorsList" Height="100" Margin="0,0,0,20">
+            <ListBox x:Name="AvailableDoctorsList" Height="100" Margin="0,0,0,20"> 
                 <ListBoxItem>Dr. Smith</ListBoxItem>
                 <ListBoxItem>Dr. Johnson</ListBoxItem>
                 <ListBoxItem>Dr. Lee</ListBoxItem>
