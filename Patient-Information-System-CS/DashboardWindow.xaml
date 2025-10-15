@@ -1,0 +1,47 @@
+<Window x:Class="Patient_Information_System_CS.DashboardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Patient_Information_System_CS"
+        mc:Ignorable="d"
+        Title="Dashboard" Height="600" Width="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Dashboard" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,10,0">
+            <TextBlock Text="Patients in Queue:" FontWeight="Bold"/>
+            <TextBlock x:Name="PatientsInQueueText" Text="5" Margin="0,0,0,10"/>
+            <TextBlock Text="Rooms Occupied / Total:" FontWeight="Bold"/>
+            <TextBlock x:Name="RoomsText" Text="3 / 10" Margin="0,0,0,10"/>
+            <TextBlock Text="Available Doctors / Total:" FontWeight="Bold"/>
+            <TextBlock x:Name="DoctorsText" Text="4 / 8" Margin="0,0,0,10"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="1">
+            <TextBlock Text="Available Doctors:" FontWeight="Bold"/>
+            <ListBox x:Name="AvailableDoctorsList" Height="100" Margin="0,0,0,20">
+                <ListBoxItem>Dr. Smith</ListBoxItem>
+                <ListBoxItem>Dr. Johnson</ListBoxItem>
+                <ListBoxItem>Dr. Lee</ListBoxItem>
+                <ListBoxItem>Dr. Patel</ListBoxItem>
+            </ListBox>
+            <TextBlock Text="Patients in Queue:" FontWeight="Bold"/>
+            <ListBox x:Name="PatientsInQueueList" Height="100">
+                <ListBoxItem>Patient A</ListBoxItem>
+                <ListBoxItem>Patient B</ListBoxItem>
+                <ListBoxItem>Patient C</ListBoxItem>
+                <ListBoxItem>Patient D</ListBoxItem>
+                <ListBoxItem>Patient E</ListBoxItem>
+            </ListBox>
+        </StackPanel>
+    </Grid>
+</Window>
