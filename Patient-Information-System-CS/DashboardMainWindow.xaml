@@ -1,0 +1,214 @@
+<Window x:Class="Patient_Information_System_CS.DashboardMainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Patient_Information_System_CS"
+        xmlns:vm="clr-namespace:Patient_Information_System_CS.ViewModels"
+        mc:Ignorable="d"
+        Title="Hospital Management System" 
+        Height="800" 
+        Width="1400"
+        WindowState="Maximized"
+        WindowStartupLocation="CenterScreen">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Header Bar -->
+        <Border Grid.Row="0" 
+                Background="#4A90E2"
+                Height="60"
+                CornerRadius="0">
+            <Grid Margin="20,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Logo/Title -->
+                <TextBlock Grid.Column="0" 
+                           Text="HOSPITAL MANAGEMENT" 
+                           FontSize="22" 
+                           FontWeight="Bold"
+                           Foreground="White"
+                           VerticalAlignment="Center"/>
+
+                <!-- User Info -->
+                <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                    <StackPanel Orientation="Vertical"
+                        Margin="0,0,15,0"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="{Binding CurrentUserDisplayName, StringFormat='Welcome, {0}'}"
+                           FontSize="14"
+                           Foreground="White"
+                           FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding CurrentUserRole, StringFormat='Role: {0}'}"
+                           FontSize="12"
+                           Foreground="#E8EAF6"/>
+                    </StackPanel>
+                    <Button Content="Logout" 
+                        Background="#DC3545"
+                        Foreground="White"
+                        Padding="15,8"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Click="LogoutButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content Area with Left Navigation -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Navigation Panel -->
+            <Border Grid.Column="0" 
+                    Background="#2C3E50"
+                    BorderBrush="#1A252F"
+                    BorderThickness="0,0,1,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,10,0,0">
+                        
+                        <!-- Admin Navigation Items -->
+                        <StackPanel Visibility="{Binding IsAdminRole, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <RadioButton Content="Dashboard" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       IsChecked="True"
+                                       Tag="Dashboard"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Admission" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Admission"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Staffs" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Staffs"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Doctors" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Doctors"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Patients" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Patients"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Appointments" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Appointments"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Billing/Invoice" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Billing/Invoice"
+                                       Click="NavButton_Click"/>
+                        </StackPanel>
+
+                        <!-- Doctor Navigation Items -->
+                        <StackPanel Visibility="{Binding IsDoctorRole, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <RadioButton Content="Dashboard" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       IsChecked="True"
+                                       Tag="Dashboard"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Patient" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Patient"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Appointments" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Appointments"
+                                       Click="NavButton_Click"/>
+                        </StackPanel>
+
+                        <!-- Patient Navigation Items -->
+                        <StackPanel Visibility="{Binding IsPatientRole, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <RadioButton Content="Dashboard" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       IsChecked="True"
+                                       Tag="Dashboard"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Appointments" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Appointments"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Discharge" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Discharge"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Insurance" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Insurance"
+                                       Click="NavButton_Click"/>
+                        </StackPanel>
+
+                        <!-- Staff/Receptionist Navigation Items -->
+                        <StackPanel Visibility="{Binding IsStaffRole, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <RadioButton Content="Dashboard" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       IsChecked="True"
+                                       Tag="Dashboard"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Admission" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Admission"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Doctors" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Doctors"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Patients" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Patients"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Appointments" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Appointments"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Billing/Invoice" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Billing/Invoice"
+                                       Click="NavButton_Click"/>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Main Content Area -->
+            <Border Grid.Column="1" 
+                    Background="#F5F5F5"
+                    Padding="0">
+                <ContentControl Content="{Binding CurrentView}"/>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

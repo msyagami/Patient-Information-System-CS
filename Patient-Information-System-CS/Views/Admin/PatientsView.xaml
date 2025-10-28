@@ -1,0 +1,133 @@
+<UserControl x:Class="Patient_Information_System_CS.Views.Admin.PatientsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="1000"
+             Background="White">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header with Add Button -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Master Patient Directory" 
+                       FontSize="28" 
+                       FontWeight="Bold"
+                       Foreground="#2C3E50"
+                       VerticalAlignment="Center"/>
+            <Button Content="+ View/Add Patient Record" 
+                    Background="#28A745"
+                    Foreground="White"
+                    Padding="20,10"
+                    FontSize="14"
+                    FontWeight="SemiBold"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    HorizontalAlignment="Right"/>
+        </Grid>
+
+        <TabControl Grid.Row="1" FontSize="14">
+            <TabItem Header="Active Patients" Padding="15,10">
+                <Border BorderBrush="#DEE2E6" 
+                        BorderThickness="1"
+                        CornerRadius="5"
+                        Padding="15">
+                    <DataGrid x:Name="ActivePatientsGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              IsReadOnly="True"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal"
+                              AlternatingRowBackground="#F8F9FA"
+                              RowHeight="45">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Patient #"
+                                                Width="*"
+                                                Binding="{Binding PatientProfile.PatientNumber}"/>
+                            <DataGridTextColumn Header="Name"
+                                                Width="2*"
+                                                Binding="{Binding DisplayName}"/>
+                            <DataGridTextColumn Header="Contact"
+                                                Width="*"
+                                                Binding="{Binding PatientProfile.ContactNumber}"/>
+                            <DataGridTextColumn Header="Last Admission"
+                                                Width="*"
+                                                Binding="{Binding PatientProfile.AdmitDate, StringFormat={}{0:MMM dd, yyyy}}"/>
+                            <DataGridTextColumn Header="Assigned Doctor"
+                                                Width="*"
+                                                Binding="{Binding PatientProfile.AssignedDoctorName}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+            </TabItem>
+
+            <TabItem Header="Pending Approval" Padding="15,10">
+                <StackPanel>
+                    <Border Background="#FFF3CD" 
+                            BorderBrush="#FFC107"
+                            BorderThickness="1"
+                            Padding="15"
+                            CornerRadius="5"
+                            Margin="0,0,0,15">
+                        <TextBlock x:Name="PendingPatientsBanner"
+                                   FontWeight="SemiBold"
+                                   Foreground="#856404"/>
+                    </Border>
+
+                    <DataGrid x:Name="PendingPatientsGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              IsReadOnly="True"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal"
+                              AlternatingRowBackground="#F8F9FA"
+                              RowHeight="45">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Patient #"
+                                                Width="*"
+                                                Binding="{Binding PatientProfile.PatientNumber}"/>
+                            <DataGridTextColumn Header="Name"
+                                                Width="2*"
+                                                Binding="{Binding DisplayName}"/>
+                            <DataGridTextColumn Header="Contact"
+                                                Width="*"
+                                                Binding="{Binding PatientProfile.ContactNumber}"/>
+                            <DataGridTextColumn Header="Requested Doctor"
+                                                Width="*"
+                                                Binding="{Binding PatientProfile.AssignedDoctorName}"/>
+                            <DataGridTemplateColumn Header="Action" Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="Approve"
+                                                    Background="#28A745"
+                                                    Foreground="White"
+                                                    Padding="12,6"
+                                                    BorderThickness="0"
+                                                    Cursor="Hand"
+                                                    Margin="0,0,8,0"
+                                                    Click="ApprovePatient_Click"/>
+                                            <Button Content="Reject"
+                                                    Background="#DC3545"
+                                                    Foreground="White"
+                                                    Padding="12,6"
+                                                    BorderThickness="0"
+                                                    Cursor="Hand"
+                                                    Click="RejectPatient_Click"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>
