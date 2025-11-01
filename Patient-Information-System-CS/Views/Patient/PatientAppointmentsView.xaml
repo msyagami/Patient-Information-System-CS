@@ -9,38 +9,75 @@
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Title -->
-        <TextBlock Grid.Row="0" 
-                   Text="My Appointments" 
-                   FontSize="28" 
+        <TextBlock Grid.Row="0"
+                   Text="My Appointments"
+                   FontSize="28"
                    FontWeight="Bold"
-                   Margin="0,0,0,20"
                    Foreground="#2C3E50"/>
 
-        <!-- Appointments DataGrid -->
-        <DataGrid Grid.Row="1" 
-                  AutoGenerateColumns="False"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  IsReadOnly="True"
-                  HeadersVisibility="Column"
-                  GridLinesVisibility="Horizontal"
-                  AlternatingRowBackground="#F8F9FA"
-                  RowHeight="40">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Date &amp; Time" 
-                                    Width="2*"
-                                    Binding="{Binding DateTime}"/>
-                <DataGridTextColumn Header="Doctor" 
-                                    Width="2*"
-                                    Binding="{Binding Doctor}"/>
-                <DataGridTextColumn Header="Status" 
-                                    Width="*"
-                                    Binding="{Binding Status}"/>
-            </DataGrid.Columns>
-        </DataGrid>
+        <TextBlock Grid.Row="1"
+                   x:Name="SubtitleTextBlock"
+                   Text="Track upcoming visits and past consultations"
+                   Foreground="#607D8B"
+                   Margin="0,6,0,18"/>
+
+        <Border Grid.Row="2"
+                BorderBrush="#DEE2E6"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <DataGrid x:Name="AppointmentsGrid"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          IsReadOnly="True"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal"
+                          AlternatingRowBackground="#F8F9FA"
+                          RowHeight="42">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Date &amp; Time"
+                                            Width="*"
+                                            Binding="{Binding ScheduledFor, StringFormat={}{0:MMM dd, yyyy h:mm tt}}"/>
+                        <DataGridTextColumn Header="Doctor"
+                                            Width="*"
+                                            Binding="{Binding DoctorName}"/>
+                        <DataGridTextColumn Header="Status"
+                                            Width="*"
+                                            Binding="{Binding StatusDisplay}"/>
+                        <DataGridTextColumn Header="Notes"
+                                            Width="2*"
+                                            Binding="{Binding Description}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <TextBlock x:Name="EmptyStateTextBlock"
+                           Grid.Row="0"
+                           Text="No appointments yet. Reach out to the admissions desk to schedule your next visit."
+                           Foreground="#6C757D"
+                           TextAlignment="Center"
+                           VerticalAlignment="Center"
+                           Visibility="Collapsed"
+                           TextWrapping="Wrap"
+                           Margin="20"/>
+
+                <TextBlock x:Name="LastUpdatedTextBlock"
+                           Grid.Row="1"
+                           Margin="0,16,0,0"
+                           Foreground="#6C757D"
+                           FontSize="12"
+                           Text=""/>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>

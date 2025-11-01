@@ -27,7 +27,8 @@
                     FontWeight="SemiBold"
                     BorderThickness="0"
                     Cursor="Hand"
-                    HorizontalAlignment="Right"/>
+                    HorizontalAlignment="Right"
+                    Click="AddPatientButton_Click"/>
         </Grid>
 
         <TabControl Grid.Row="1" FontSize="14">

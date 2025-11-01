@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Patient_Information_System_CS.Models;
 using Patient_Information_System_CS.Services;
+using Patient_Information_System_CS.Views.Admin.Dialogs;
 
 namespace Patient_Information_System_CS.Views.Admin
 {
@@ -67,6 +68,38 @@ namespace Patient_Information_System_CS.Views.Admin
 
             _dataService.RejectPatient(patient);
             RefreshTables();
+        }
+
+        private void AddPatientButton_Click(object sender, RoutedEventArgs e)
+        {
+            var doctors = _dataService.GetActiveDoctors().Concat(_dataService.GetUnavailableDoctors()).ToList();
+            var dialog = new AddPatientWindow(doctors)
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            if (dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            var account = _dataService.CreatePatientAccount(dialog.FullName,
+                                                            dialog.Email,
+                                                            dialog.ContactNumber,
+                                                            dialog.Address,
+                                                            dialog.DateOfBirth,
+                                                            dialog.ShouldApprove,
+                                                            dialog.IsCurrentlyAdmitted,
+                                                            dialog.SelectedDoctorId,
+                                                            dialog.InsuranceProvider,
+                                                            dialog.EmergencyContact,
+                                                            dialog.RoomAssignment);
+
+            RefreshTables();
+            MessageBox.Show($"Patient record for {account.DisplayName} created.",
+                            "Patient Added",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
         }
     }
 }

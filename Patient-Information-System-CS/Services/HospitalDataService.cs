@@ -104,6 +104,135 @@ namespace Patient_Information_System_CS.Services
                 : DoctorStatus.Available;
         }
 
+        public UserAccount CreateStaffAccount(string fullName,
+                                               string email,
+                                               string contactNumber,
+                                               bool approve)
+        {
+            if (string.IsNullOrWhiteSpace(fullName))
+            {
+                throw new ArgumentException("Full name is required", nameof(fullName));
+            }
+
+            var username = GenerateUniqueUsername(fullName, "staff");
+            var account = new UserAccount
+            {
+                UserId = _nextUserId++,
+                Username = username,
+                Password = "changeme",
+                DisplayName = fullName,
+                Email = string.IsNullOrWhiteSpace(email) ? GenerateEmailAddress(fullName) : email,
+                Role = UserRole.Staff,
+                IsActive = approve,
+                StaffProfile = new StaffProfile
+                {
+                    IsApproved = approve,
+                    ContactNumber = contactNumber
+                }
+            };
+
+            _accounts.Add(account);
+            return account;
+        }
+
+        public UserAccount CreateDoctorAccount(string fullName,
+                                                string email,
+                                                string contactNumber,
+                                                string department,
+                                                string licenseNumber,
+                                                string address,
+                                                DoctorStatus status)
+        {
+            if (string.IsNullOrWhiteSpace(fullName))
+            {
+                throw new ArgumentException("Full name is required", nameof(fullName));
+            }
+
+            if (string.IsNullOrWhiteSpace(department))
+            {
+                throw new ArgumentException("Department is required", nameof(department));
+            }
+
+            var username = GenerateUniqueUsername(fullName, "doctor");
+            var account = new UserAccount
+            {
+                UserId = _nextUserId++,
+                Username = username,
+                Password = "doctorpass",
+                DisplayName = fullName,
+                Email = string.IsNullOrWhiteSpace(email) ? GenerateEmailAddress(fullName) : email,
+                Role = UserRole.Doctor,
+                IsActive = status == DoctorStatus.Available,
+                DoctorProfile = new DoctorProfile
+                {
+                    Status = status,
+                    Department = department,
+                    ContactNumber = contactNumber,
+                    LicenseNumber = licenseNumber,
+                    Address = address,
+                    ApplicationDate = DateTime.Today
+                }
+            };
+
+            _accounts.Add(account);
+            return account;
+        }
+
+        public UserAccount CreatePatientAccount(string fullName,
+                                                 string email,
+                                                 string contactNumber,
+                                                 string address,
+                                                 DateTime dateOfBirth,
+                                                 bool approve,
+                                                 bool currentlyAdmitted,
+                                                 int? assignedDoctorId,
+                                                 string insuranceProvider,
+                                                 string emergencyContact,
+                                                 string roomAssignment)
+        {
+            if (string.IsNullOrWhiteSpace(fullName))
+            {
+                throw new ArgumentException("Full name is required", nameof(fullName));
+            }
+
+            var doctor = GetDoctorById(assignedDoctorId);
+            var patientNumber = GeneratePatientNumber();
+            var username = GeneratePatientUsername(fullName);
+            var resolvedRoom = currentlyAdmitted
+                ? (string.IsNullOrWhiteSpace(roomAssignment) ? "Room 101 - General Ward" : roomAssignment)
+                : string.Empty;
+
+            var account = new UserAccount
+            {
+                UserId = _nextUserId++,
+                Username = username,
+                Password = "patientpass",
+                DisplayName = fullName,
+                Email = string.IsNullOrWhiteSpace(email) ? GenerateEmailAddress(fullName) : email,
+                Role = UserRole.Patient,
+                IsActive = approve || currentlyAdmitted,
+                PatientProfile = new PatientProfile
+                {
+                    IsApproved = approve,
+                    HasUnpaidBills = false,
+                    PatientNumber = patientNumber,
+                    AdmitDate = currentlyAdmitted ? DateTime.Today : null,
+                    RoomAssignment = resolvedRoom,
+                    ContactNumber = contactNumber,
+                    Address = address,
+                    EmergencyContact = emergencyContact,
+                    InsuranceProvider = string.IsNullOrWhiteSpace(insuranceProvider) ? "Not Provided" : insuranceProvider,
+                    AssignedDoctorId = doctor?.UserId,
+                    AssignedDoctorName = doctor?.DisplayName ?? "Unassigned",
+                    DateOfBirth = dateOfBirth,
+                    IsCurrentlyAdmitted = currentlyAdmitted
+                }
+            };
+
+            _accounts.Add(account);
+            return account;
+        }
+
         public IEnumerable<UserAccount> GetApprovedPatients() =>
             _accounts.Where(account => account.Role == UserRole.Patient && account.PatientProfile?.IsApproved == true)
                      .ToList();
@@ -197,6 +326,20 @@ namespace Patient_Information_System_CS.Services
                          .OrderBy(appointment => appointment.ScheduledFor)
                          .ToList();
 
+        public IEnumerable<Appointment> GetAppointmentsForDoctor(int doctorId) =>
+            _appointments.Where(appointment => appointment.DoctorId == doctorId)
+                         .OrderBy(appointment => appointment.ScheduledFor)
+                         .ToList();
+
+        public IEnumerable<Appointment> GetAppointmentsForPatient(int patientId) =>
+            _appointments.Where(appointment => appointment.PatientId == patientId)
+                         .OrderBy(appointment => appointment.ScheduledFor)
+                         .ToList();
+
+        public IEnumerable<Appointment> GetAllAppointments() =>
+            _appointments.OrderBy(appointment => appointment.ScheduledFor)
+                         .ToList();
+
         public Appointment ScheduleAppointment(int? patientId,
                                                int? doctorId,
                                                DateTime scheduledFor,
@@ -256,6 +399,16 @@ namespace Patient_Information_System_CS.Services
             appointment.Status = AppointmentStatus.Completed;
         }
 
+        public void CancelAppointment(Appointment appointment)
+        {
+            if (appointment.Status == AppointmentStatus.Completed)
+            {
+                return;
+            }
+
+            appointment.Status = AppointmentStatus.Rejected;
+        }
+
         public IEnumerable<BillingRecord> GetOutstandingInvoices() =>
             _billingRecords.Where(record => !record.IsPaid)
                            .OrderByDescending(record => record.ReleaseDate)
@@ -269,6 +422,11 @@ namespace Patient_Information_System_CS.Services
         public BillingRecord? GetInvoiceById(int invoiceId) =>
             _billingRecords.FirstOrDefault(record => record.InvoiceId == invoiceId);
 
+        public IEnumerable<BillingRecord> GetInvoicesForPatient(int patientId) =>
+            _billingRecords.Where(record => record.PatientId == patientId)
+                           .OrderByDescending(record => record.ReleaseDate)
+                           .ToList();
+
         public void MarkInvoicePaid(BillingRecord invoice)
         {
             if (invoice.IsPaid)
@@ -280,6 +438,8 @@ namespace Patient_Information_System_CS.Services
             invoice.PaidDate = DateTime.Today;
             UpdatePatientBillingStatus(invoice.PatientId);
         }
+
+        public IEnumerable<UserAccount> GetSchedulablePatients() => GetApprovedPatients();
 
         public UserAccount AdmitNewPatient(string fullName,
                                            DateTime dateOfBirth,
@@ -352,6 +512,26 @@ namespace Patient_Information_System_CS.Services
             }
 
             return username;
+        }
+
+        private string GenerateUniqueUsername(string fullName, string prefix)
+        {
+            var slug = fullName.Replace(" ", string.Empty, StringComparison.Ordinal)
+                                .ToLowerInvariant();
+
+            if (string.IsNullOrWhiteSpace(slug))
+            {
+                slug = prefix;
+            }
+
+            var candidate = slug;
+            var counter = 1;
+            while (_accounts.Any(account => string.Equals(account.Username, candidate, StringComparison.OrdinalIgnoreCase)))
+            {
+                candidate = $"{slug}{counter++}";
+            }
+
+            return candidate;
         }
 
         private static string GenerateEmailAddress(string fullName)

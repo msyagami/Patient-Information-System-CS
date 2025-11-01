@@ -1,0 +1,82 @@
+<Window x:Class="Patient_Information_System_CS.Views.Admin.Dialogs.AddStaffWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add Staff Account"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="WidthAndHeight"
+        ResizeMode="NoResize"
+        Background="White"
+        MinWidth="420">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="240"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
+                   Text="Provide the details for the new staff member"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   Margin="0,0,0,18"
+                   Foreground="#2C3E50"/>
+
+        <TextBlock Grid.Row="1" Grid.Column="0"
+                   Text="Full name"
+                   VerticalAlignment="Center"
+                   Margin="0,0,16,0"/>
+        <TextBox x:Name="FullNameTextBox"
+                 Grid.Row="1" Grid.Column="1"
+                 MinWidth="240"
+                 Margin="0,0,0,12"/>
+
+        <TextBlock Grid.Row="2" Grid.Column="0"
+                   Text="Email"
+                   VerticalAlignment="Center"
+                   Margin="0,0,16,0"/>
+        <TextBox x:Name="EmailTextBox"
+                 Grid.Row="2" Grid.Column="1"
+                 Margin="0,0,0,12"/>
+
+        <TextBlock Grid.Row="3" Grid.Column="0"
+                   Text="Contact number"
+                   VerticalAlignment="Center"
+                   Margin="0,0,16,0"/>
+        <StackPanel Grid.Row="3" Grid.Column="1"
+                    Margin="0,0,0,12">
+            <TextBox x:Name="ContactTextBox"/>
+            <CheckBox x:Name="ApproveCheckBox"
+                      Content="Mark as approved"
+                      Margin="0,8,0,0"/>
+        </StackPanel>
+
+        <TextBlock x:Name="ErrorTextBlock"
+                   Grid.Row="4" Grid.ColumnSpan="2"
+                   Foreground="#B91C1C"
+                   Visibility="Collapsed"
+                   Margin="0,0,0,12"/>
+
+        <StackPanel Grid.Row="5" Grid.ColumnSpan="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,12,0,0">
+            <Button Content="Cancel"
+                    Width="90"
+                    Margin="0,0,8,0"
+                    Click="CancelButton_Click"/>
+            <Button Content="Save"
+                    Width="90"
+                    Background="#28A745"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Click="SaveButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

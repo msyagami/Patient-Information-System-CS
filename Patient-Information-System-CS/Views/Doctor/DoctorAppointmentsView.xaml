@@ -8,33 +8,45 @@
              Background="White">
     <Grid Margin="20">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="2.2*"/>
+            <ColumnDefinition Width="24"/>
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Left Side - Appointment List -->
-        <Border Grid.Column="0" 
-                BorderBrush="#DEE2E6" 
+        <Border Grid.Column="0"
+                BorderBrush="#DEE2E6"
                 BorderThickness="1"
-                CornerRadius="5"
-                Padding="15">
+                CornerRadius="6"
+                Padding="18">
             <Grid>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- Title -->
-                <TextBlock Grid.Row="0" 
-                           Text="Appointments" 
-                           FontSize="22" 
-                           FontWeight="Bold"
-                           Margin="0,0,0,15"
-                           Foreground="#2C3E50"/>
+                <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,12">
+                    <TextBlock Text="My Schedule"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               Foreground="#2C3E50"/>
+                    <Border x:Name="TodayBadge"
+                            Background="#0D6EFD"
+                            CornerRadius="12"
+                            Margin="14,0,0,0"
+                            Padding="10,4">
+                        <TextBlock Text="Today"
+                                   Foreground="White"
+                                   FontWeight="SemiBold"/>
+                    </Border>
+                </StackPanel>
 
-                <!-- Appointments DataGrid -->
-                <DataGrid Grid.Row="1" 
+                <TextBlock Grid.Row="1"
+                           Text="Select an appointment to review details or update its status"
+                           Foreground="#607D8B"
+                           Margin="0,0,0,12"/>
+
+                <DataGrid Grid.Row="2"
                           x:Name="AppointmentsDataGrid"
                           AutoGenerateColumns="False"
                           CanUserAddRows="False"
@@ -43,156 +55,107 @@
                           HeadersVisibility="Column"
                           GridLinesVisibility="Horizontal"
                           AlternatingRowBackground="#F8F9FA"
-                          RowHeight="40"
-                          SelectionMode="Single">
+                          RowHeight="42"
+                          SelectionMode="Single"
+                          SelectionChanged="AppointmentsDataGrid_SelectionChanged">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Date &amp; Time" 
+                        <DataGridTextColumn Header="Start"
                                             Width="*"
-                                            Binding="{Binding DateTime}"/>
-                        <DataGridTextColumn Header="Patient Name" 
+                                            Binding="{Binding ScheduledFor, StringFormat={}{0:MMM dd, h:mm tt}}"/>
+                        <DataGridTextColumn Header="Patient"
                                             Width="*"
                                             Binding="{Binding PatientName}"/>
-                        <DataGridTextColumn Header="Status" 
+                        <DataGridTextColumn Header="Status"
                                             Width="*"
-                                            Binding="{Binding Status}"/>
-                        <DataGridTemplateColumn Header="Action" Width="Auto">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button Content="Manage" 
-                                            Background="#0D6EFD"
-                                            Foreground="White"
-                                            Padding="10,5"
-                                            BorderThickness="0"
-                                            Cursor="Hand"
-                                            Margin="5,0"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                                            Binding="{Binding StatusDisplay}"/>
+                        <DataGridTextColumn Header="Notes"
+                                            Width="2*"
+                                            Binding="{Binding Description}"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>
         </Border>
 
-        <!-- Right Side - Appointment Details/Management Panel -->
-        <Border Grid.Column="2" 
-                BorderBrush="#DEE2E6" 
+        <Border Grid.Column="2"
+                BorderBrush="#DEE2E6"
                 BorderThickness="1"
-                CornerRadius="5"
-                Padding="20">
+                CornerRadius="6"
+                Padding="22">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <!-- Panel Title -->
-                    <TextBlock Text="Appointment Details &amp; Management" 
-                               FontSize="22" 
+                    <TextBlock x:Name="AppointmentTitleTextBlock"
+                               Text="Select an appointment"
+                               FontSize="24"
                                FontWeight="Bold"
-                               Margin="0,0,0,20"
-                               Foreground="#2C3E50"/>
+                               Foreground="#2C3E50"
+                               Margin="0,0,0,16"/>
 
-                    <!-- Patient Information Section -->
-                    <Border Background="#F8F9FA" 
-                            Padding="15"
-                            CornerRadius="5"
-                            Margin="0,0,0,20">
-                        <StackPanel>
-                            <TextBlock Text="Patient Information" 
-                                       FontSize="16" 
-                                       FontWeight="SemiBold"
-                                       Margin="0,0,0,10"/>
-                            <TextBlock Text="Name: Mike Jordan Candido" Margin="0,3"/>
-                            <TextBlock Text="Contact: 09462566352" Margin="0,3"/>
-                            <TextBlock Text="Date: March 18, 2024 - 9:00AM" Margin="0,3"/>
-                        </StackPanel>
-                    </Border>
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-                    <!-- Medical Records Input -->
-                    <TextBlock Text="Medical Records:" 
-                               FontWeight="SemiBold"
-                               Margin="0,10,0,5"/>
-                    <TextBox Height="100"
-                             TextWrapping="Wrap"
-                             AcceptsReturn="True"
-                             VerticalScrollBarVisibility="Auto"
-                             Padding="10"
-                             FontSize="14"
-                             Margin="0,0,0,15"/>
+                        <TextBlock Text="Patient" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Row="1" Text="Scheduled" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Row="2" Text="Status" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Row="3" Text="Concern" FontWeight="SemiBold"/>
 
-                    <!-- Diagnosis Input -->
-                    <TextBlock Text="Diagnosis:" 
-                               FontWeight="SemiBold"
-                               Margin="0,10,0,5"/>
-                    <TextBox Height="100"
-                             TextWrapping="Wrap"
-                             AcceptsReturn="True"
-                             VerticalScrollBarVisibility="Auto"
-                             Padding="10"
-                             FontSize="14"
-                             Margin="0,0,0,15"
-                             Text="Fever"/>
+                        <TextBlock x:Name="PatientNameTextBlock" Grid.Column="1" Text="-"/>
+                        <TextBlock x:Name="ScheduledTextBlock" Grid.Column="1" Grid.Row="1" Text="-"/>
+                        <TextBlock x:Name="StatusTextBlock" Grid.Column="1" Grid.Row="2" Text="-"/>
+                        <TextBlock x:Name="DescriptionTextBlock" Grid.Column="1" Grid.Row="3" Text="-" TextWrapping="Wrap"/>
+                    </Grid>
 
-                    <!-- Treatment Input -->
-                    <TextBlock Text="Treatment:" 
-                               FontWeight="SemiBold"
-                               Margin="0,10,0,5"/>
-                    <TextBox Height="100"
-                             TextWrapping="Wrap"
-                             AcceptsReturn="True"
-                             VerticalScrollBarVisibility="Auto"
-                             Padding="10"
-                             FontSize="14"
-                             Margin="0,0,0,15"/>
-
-                    <!-- Prescriptions Input -->
-                    <TextBlock Text="Prescriptions:" 
-                               FontWeight="SemiBold"
-                               Margin="0,10,0,5"/>
-                    <TextBox Height="100"
-                             TextWrapping="Wrap"
-                             AcceptsReturn="True"
-                             VerticalScrollBarVisibility="Auto"
-                             Padding="10"
-                             FontSize="14"
-                             Margin="0,0,0,20"/>
-
-                    <!-- Status Modification -->
-                    <TextBlock Text="Appointment Status:" 
-                               FontWeight="SemiBold"
-                               Margin="0,10,0,10"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <RadioButton Content="Pending" 
-                                     GroupName="Status"
-                                     Margin="0,0,20,0"
-                                     IsChecked="True"/>
-                        <RadioButton Content="Confirmed" 
-                                     GroupName="Status"
-                                     Margin="0,0,20,0"/>
-                        <RadioButton Content="Completed" 
-                                     GroupName="Status"
-                                     Margin="0,0,20,0"/>
-                        <RadioButton Content="Cancelled" 
-                                     GroupName="Status"/>
-                    </StackPanel>
-
-                    <!-- Action Buttons -->
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
-                        <Button Content="Save Record" 
-                                Background="#28A745"
-                                Foreground="White"
-                                Padding="30,12"
-                                FontSize="16"
-                                FontWeight="SemiBold"
-                                BorderThickness="0"
-                                Cursor="Hand"
-                                Margin="0,0,10,0"/>
-                        <Button Content="Update Appointment" 
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
+                        <Button x:Name="AcceptButton"
+                                Content="Accept"
                                 Background="#0D6EFD"
                                 Foreground="White"
-                                Padding="30,12"
-                                FontSize="16"
+                                Padding="24,10"
                                 FontWeight="SemiBold"
                                 BorderThickness="0"
-                                Cursor="Hand"/>
+                                Margin="0,0,12,0"
+                                Visibility="Collapsed"
+                                Click="AcceptButton_Click"/>
+                        <Button x:Name="CompleteButton"
+                                Content="Mark Completed"
+                                Background="#198754"
+                                Foreground="White"
+                                Padding="24,10"
+                                FontWeight="SemiBold"
+                                BorderThickness="0"
+                                Margin="0,0,12,0"
+                                Visibility="Collapsed"
+                                Click="CompleteButton_Click"/>
+                        <Button x:Name="CancelButton"
+                                Content="Cancel"
+                                Background="#6C757D"
+                                Foreground="White"
+                                Padding="20,10"
+                                FontWeight="SemiBold"
+                                BorderThickness="0"
+                                Visibility="Collapsed"
+                                Click="CancelButton_Click"/>
                     </StackPanel>
 
+                    <Border Background="#E3F2FD"
+                            BorderBrush="#90CAF9"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="14"
+                            Visibility="Collapsed"
+                            x:Name="InstructionBorder">
+                        <TextBlock Text="Pending visits need your confirmation. Completed visits update the patient's history automatically."
+                                   Foreground="#0D47A1"
+                                   TextWrapping="Wrap"/>
+                    </Border>
                 </StackPanel>
             </ScrollViewer>
         </Border>

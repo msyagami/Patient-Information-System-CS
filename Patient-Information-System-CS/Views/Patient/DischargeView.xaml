@@ -3,269 +3,143 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:models="clr-namespace:Patient_Information_System_CS.Models"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="700" d:DesignWidth="1100"
              Background="White">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="20">
-            
-            <!-- Invoice 1 -->
-            <TextBlock Text="Invoice Date: March 14, 2024" 
-                       FontSize="24" 
+        <StackPanel Margin="24">
+            <TextBlock Text="Discharge &amp; Billing Summary"
+                       FontSize="28"
                        FontWeight="Bold"
-                       Margin="0,10,0,10"
-                       Foreground="#2C3E50"/>
-            
-            <Border BorderBrush="#DEE2E6" 
-                    BorderThickness="1" 
-                    Padding="20"
-                    Margin="0,0,0,30">
+                       Foreground="#2C3E50"
+                       Margin="0,0,0,8"/>
+            <TextBlock x:Name="PatientSummaryTextBlock"
+                       Text="Review your recent hospital stays and invoices"
+                       Foreground="#607D8B"
+                       Margin="0,0,0,24"/>
+
+            <Border x:Name="EmptyStateBorder"
+                    Background="#F8F9FA"
+                    BorderBrush="#E0E0E0"
+                    BorderThickness="1"
+                    Padding="24"
+                    CornerRadius="6"
+                    Visibility="Collapsed">
                 <StackPanel>
-                    <!-- Hospital Header -->
-                    <TextBlock Text="Hospital Management" 
-                               FontSize="28" 
-                               FontWeight="Bold"
-                               HorizontalAlignment="Center"
-                               Margin="0,0,0,20"/>
-
-                    <!-- Patient and Admission Info Grid -->
-                    <Grid Margin="0,0,0,20">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <!-- Left Column -->
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Patient Name: Mike Jordan Candido" Margin="0,3"/>
-                            <TextBlock Text="Patient Contact: 09462566352" Margin="0,3"/>
-                            <TextBlock Text="Patient Address: 8246 Philippines Streets" Margin="0,3"/>
-                        </StackPanel>
-
-                        <!-- Right Column -->
-                        <StackPanel Grid.Column="1">
-                            <TextBlock Text="Admit Date: March 13, 2024" Margin="0,3"/>
-                            <TextBlock Text="Release Date: March 14, 2024" Margin="0,3"/>
-                            <TextBlock Text="Days Spent At the Hospital: 0" Margin="0,3"/>
-                            <TextBlock Text="Doctor Name: Kujo Sara" Margin="0,3"/>
-                        </StackPanel>
-                    </Grid>
-
-                    <!-- Disease and Symptoms -->
-                    <Border Background="#F8F9FA" Padding="10" Margin="0,0,0,15">
-                        <StackPanel>
-                            <TextBlock Text="Disease and Symptoms" 
-                                       FontWeight="Bold" 
-                                       Margin="0,0,0,5"/>
-                            <TextBlock Text="Fever, Rash"/>
-                        </StackPanel>
-                    </Border>
-
-                    <!-- Invoice Table -->
-                    <Border BorderBrush="#DEE2E6" BorderThickness="1" Margin="0,0,0,10">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="3*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <!-- Header -->
-                            <Border Grid.Row="0" Grid.Column="0" Background="#F8F9FA" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,1,1">
-                                <TextBlock Text="Item" FontWeight="Bold"/>
-                            </Border>
-                            <Border Grid.Row="0" Grid.Column="1" Background="#F8F9FA" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,0,1">
-                                <TextBlock Text="Price" FontWeight="Bold"/>
-                            </Border>
-
-                            <!-- Row 1 -->
-                            <Border Grid.Row="1" Grid.Column="0" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,1,1">
-                                <TextBlock Text="Room Charge of 0 Days"/>
-                            </Border>
-                            <Border Grid.Row="1" Grid.Column="1" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,0,1">
-                                <TextBlock Text="0"/>
-                            </Border>
-
-                            <!-- Row 2 -->
-                            <Border Grid.Row="2" Grid.Column="0" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,1,1">
-                                <TextBlock Text="Doctor Fee"/>
-                            </Border>
-                            <Border Grid.Row="2" Grid.Column="1" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,0,1">
-                                <TextBlock Text="500"/>
-                            </Border>
-
-                            <!-- Row 3 -->
-                            <Border Grid.Row="3" Grid.Column="0" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,1,1">
-                                <TextBlock Text="Medicine Cost"/>
-                            </Border>
-                            <Border Grid.Row="3" Grid.Column="1" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,0,1">
-                                <TextBlock Text="0"/>
-                            </Border>
-
-                            <!-- Row 4 -->
-                            <Border Grid.Row="4" Grid.Column="0" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,1,0">
-                                <TextBlock Text="Other Charge"/>
-                            </Border>
-                            <Border Grid.Row="4" Grid.Column="1" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,0,0">
-                                <TextBlock Text="0"/>
-                            </Border>
-                        </Grid>
-                    </Border>
-
-                    <!-- Total -->
-                    <TextBlock Text="Total: 500" 
-                               FontWeight="Bold" 
-                               FontSize="16"
-                               HorizontalAlignment="Right"
-                               Margin="0,10,0,15"/>
-
-                    <!-- Download Button -->
-                    <Button Content="Download" 
-                            Background="#DC3545"
-                            Foreground="White"
-                            Padding="20,10"
-                            HorizontalAlignment="Center"
-                            BorderThickness="0"
-                            Cursor="Hand"
-                            FontSize="14"/>
+                    <TextBlock Text="No discharge invoices yet"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               Margin="0,0,0,6"/>
+                    <TextBlock Text="You'll see your hospital release summaries here once an invoice is generated."
+                               Foreground="#607D8B"/>
                 </StackPanel>
             </Border>
 
-            <!-- Invoice 2 -->
-            <TextBlock Text="Invoice Date: March 15, 2024" 
-                       FontSize="24" 
-                       FontWeight="Bold"
-                       Margin="0,10,0,10"
-                       Foreground="#2C3E50"/>
-            
-            <Border BorderBrush="#DEE2E6" 
-                    BorderThickness="1" 
-                    Padding="20"
-                    Margin="0,0,0,30">
-                <StackPanel>
-                    <!-- Hospital Header -->
-                    <TextBlock Text="Hospital Management" 
-                               FontSize="28" 
-                               FontWeight="Bold"
-                               HorizontalAlignment="Center"
-                               Margin="0,0,0,20"/>
-
-                    <!-- Patient and Admission Info Grid -->
-                    <Grid Margin="0,0,0,20">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <!-- Left Column -->
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Patient Name: Mike Jordan Candido" Margin="0,3"/>
-                            <TextBlock Text="Patient Contact: 09462566352" Margin="0,3"/>
-                            <TextBlock Text="Patient Address: 8246 Philippines Streets" Margin="0,3"/>
-                        </StackPanel>
-
-                        <!-- Right Column -->
-                        <StackPanel Grid.Column="1">
-                            <TextBlock Text="Admit Date: March 14, 2024" Margin="0,3"/>
-                            <TextBlock Text="Release Date: March 15, 2024" Margin="0,3"/>
-                            <TextBlock Text="Days Spent At the Hospital: 1" Margin="0,3"/>
-                            <TextBlock Text="Doctor Name: Neuvillette Dragon" Margin="0,3"/>
-                        </StackPanel>
-                    </Grid>
-
-                    <!-- Disease and Symptoms -->
-                    <Border Background="#F8F9FA" Padding="10" Margin="0,0,0,15">
+            <ItemsControl x:Name="InvoicesItemsControl"
+                          Margin="0,0,0,16">
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Margin" Value="0,0,0,26"/>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type models:BillingRecord}">
                         <StackPanel>
-                            <TextBlock Text="Disease and Symptoms" 
-                                       FontWeight="Bold" 
-                                       Margin="0,0,0,5"/>
-                            <TextBlock Text="Heart Palpitation"/>
+                            <TextBlock Text="{Binding ReleaseDate, StringFormat=Invoice Date: {0:MMMM dd, yyyy}}"
+                                       FontSize="22"
+                                       FontWeight="Bold"
+                                       Foreground="#2C3E50"
+                                       Margin="0,0,0,12"/>
+
+                            <Border BorderBrush="#DEE2E6"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="22">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal"
+                                                Margin="0,0,0,18"
+                                                HorizontalAlignment="Stretch">
+                                        <TextBlock Text="Hospital Management"
+                                                   FontSize="26"
+                                                   FontWeight="Bold"
+                                                   HorizontalAlignment="Left"/>
+                                        <Border Background="#E7F5FF"
+                                                BorderBrush="#91D5FF"
+                                                BorderThickness="1"
+                                                CornerRadius="12"
+                                                Padding="12,4"
+                                                Margin="18,0,0,0">
+                                            <TextBlock Text="{Binding StatusDisplay, StringFormat=Status: {0}}"
+                                                       Foreground="#0C4A6E"
+                                                       FontWeight="SemiBold"/>
+                                        </Border>
+                                    </StackPanel>
+
+                                    <Grid Margin="0,0,0,18">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding PatientName, StringFormat=Patient Name: {0}}" Margin="0,2"/>
+                                            <TextBlock Text="{Binding ContactNumber, StringFormat=Patient Contact: {0}}" Margin="0,2"/>
+                                            <TextBlock Text="{Binding Address, StringFormat=Patient Address: {0}}" Margin="0,2"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="{Binding AdmitDate, StringFormat=Admit Date: {0:MMMM dd, yyyy}}" Margin="0,2"/>
+                                            <TextBlock Text="{Binding ReleaseDate, StringFormat=Release Date: {0:MMMM dd, yyyy}}" Margin="0,2"/>
+                                            <TextBlock Text="{Binding DaysStayed, StringFormat=Days Spent at Hospital: {0}}" Margin="0,2"/>
+                                            <TextBlock Text="{Binding DoctorName, StringFormat=Doctor Name: {0}}" Margin="0,2"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Border Background="#F8F9FA"
+                                            Padding="12"
+                                            CornerRadius="6"
+                                            Margin="0,0,0,18">
+                                        <StackPanel>
+                                            <TextBlock Text="Charge Breakdown"
+                                                       FontWeight="Bold"
+                                                       Margin="0,0,0,8"/>
+                                            <UniformGrid Columns="2">
+                                                <TextBlock Text="Room Charge"/>
+                                                <TextBlock Text="{Binding RoomCharge, StringFormat={}{0:C}}" TextAlignment="Right"/>
+                                                <TextBlock Text="Doctor Fee"/>
+                                                <TextBlock Text="{Binding DoctorFee, StringFormat={}{0:C}}" TextAlignment="Right"/>
+                                                <TextBlock Text="Medicine Cost"/>
+                                                <TextBlock Text="{Binding MedicineCost, StringFormat={}{0:C}}" TextAlignment="Right"/>
+                                                <TextBlock Text="Other Charges"/>
+                                                <TextBlock Text="{Binding OtherCharge, StringFormat={}{0:C}}" TextAlignment="Right"/>
+                                            </UniformGrid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <TextBlock Text="{Binding Total, StringFormat=Total: {0:C}}"
+                                               FontWeight="Bold"
+                                               FontSize="18"
+                                               HorizontalAlignment="Right"
+                                               Margin="0,0,0,18"/>
+
+                                    <Button Content="Download Summary"
+                                            Padding="24,10"
+                                            Background="#0D6EFD"
+                                            Foreground="White"
+                                            FontSize="15"
+                                            FontWeight="SemiBold"
+                                            BorderThickness="0"
+                                            Cursor="Hand"
+                                            HorizontalAlignment="Center"
+                                            IsEnabled="False"
+                                            ToolTip="Download support coming soon"/>
+                                </StackPanel>
+                            </Border>
                         </StackPanel>
-                    </Border>
-
-                    <!-- Invoice Table -->
-                    <Border BorderBrush="#DEE2E6" BorderThickness="1" Margin="0,0,0,10">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="3*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <!-- Header -->
-                            <Border Grid.Row="0" Grid.Column="0" Background="#F8F9FA" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,1,1">
-                                <TextBlock Text="Item" FontWeight="Bold"/>
-                            </Border>
-                            <Border Grid.Row="0" Grid.Column="1" Background="#F8F9FA" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,0,1">
-                                <TextBlock Text="Price" FontWeight="Bold"/>
-                            </Border>
-
-                            <!-- Row 1 -->
-                            <Border Grid.Row="1" Grid.Column="0" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,1,1">
-                                <TextBlock Text="Room Charge of 1 Days"/>
-                            </Border>
-                            <Border Grid.Row="1" Grid.Column="1" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,0,1">
-                                <TextBlock Text="1500"/>
-                            </Border>
-
-                            <!-- Row 2 -->
-                            <Border Grid.Row="2" Grid.Column="0" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,1,1">
-                                <TextBlock Text="Doctor Fee"/>
-                            </Border>
-                            <Border Grid.Row="2" Grid.Column="1" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,0,1">
-                                <TextBlock Text="800"/>
-                            </Border>
-
-                            <!-- Row 3 -->
-                            <Border Grid.Row="3" Grid.Column="0" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,1,1">
-                                <TextBlock Text="Medicine Cost"/>
-                            </Border>
-                            <Border Grid.Row="3" Grid.Column="1" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,0,1">
-                                <TextBlock Text="350"/>
-                            </Border>
-
-                            <!-- Row 4 -->
-                            <Border Grid.Row="4" Grid.Column="0" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,1,0">
-                                <TextBlock Text="Other Charge"/>
-                            </Border>
-                            <Border Grid.Row="4" Grid.Column="1" Padding="10" BorderBrush="#DEE2E6" BorderThickness="0,0,0,0">
-                                <TextBlock Text="150"/>
-                            </Border>
-                        </Grid>
-                    </Border>
-
-                    <!-- Total -->
-                    <TextBlock Text="Total: 2800" 
-                               FontWeight="Bold" 
-                               FontSize="16"
-                               HorizontalAlignment="Right"
-                               Margin="0,10,0,15"/>
-
-                    <!-- Download Button -->
-                    <Button Content="Download" 
-                            Background="#DC3545"
-                            Foreground="White"
-                            Padding="20,10"
-                            HorizontalAlignment="Center"
-                            BorderThickness="0"
-                            Cursor="Hand"
-                            FontSize="14"/>
-                </StackPanel>
-            </Border>
-            
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

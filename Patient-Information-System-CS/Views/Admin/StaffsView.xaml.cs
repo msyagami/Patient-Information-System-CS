@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Patient_Information_System_CS.Models;
 using Patient_Information_System_CS.Services;
+using Patient_Information_System_CS.Views.Admin.Dialogs;
 
 namespace Patient_Information_System_CS.Views.Admin
 {
@@ -67,6 +68,30 @@ namespace Patient_Information_System_CS.Views.Admin
 
             _dataService.RejectStaff(account);
             RefreshTables();
+        }
+
+        private void AddStaffButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new AddStaffWindow
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            if (dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            var account = _dataService.CreateStaffAccount(dialog.FullName,
+                                                           dialog.Email,
+                                                           dialog.ContactNumber,
+                                                           dialog.ShouldApprove);
+
+            RefreshTables();
+            MessageBox.Show($"Staff account for {account.DisplayName} created.",
+                            "Staff Added",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
         }
     }
 }

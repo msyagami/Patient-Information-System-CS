@@ -4,160 +4,228 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="1200"
+             d:DesignHeight="700" d:DesignWidth="1200"
              Background="White">
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Grid Margin="24">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2.1*"/>
+            <ColumnDefinition Width="24"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
 
-        <!-- Title Bar -->
-        <Border Grid.Row="0" 
-                Background="#0D6EFD" 
-                Padding="15"
-                CornerRadius="5,5,0,0">
-            <TextBlock Text="Patient Unpaid Bills" 
-                       FontSize="20" 
+        <StackPanel Grid.Column="0">
+            <TextBlock Text="Billing Queue"
+                       FontSize="26"
                        FontWeight="Bold"
-                       Foreground="White"
-                       HorizontalAlignment="Center"/>
-        </Border>
+                       Foreground="#2C3E50"
+                       Margin="0,0,0,12"/>
+            <TextBlock Text="Track patient balances and confirm payments"
+                       Foreground="#607D8B"
+                       Margin="0,0,0,20"/>
 
-        <!-- DataGrid Section -->
-        <Border Grid.Row="1" 
-                BorderBrush="#DEE2E6" 
+            <TabControl>
+                <TabItem Header="Outstanding" Padding="16,10">
+                    <DataGrid x:Name="OutstandingInvoicesGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              IsReadOnly="True"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal"
+                              AlternatingRowBackground="#F8F9FA"
+                              RowHeight="44"
+                              SelectionChanged="OutstandingInvoicesGrid_SelectionChanged">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Invoice #"
+                                                Width="Auto"
+                                                Binding="{Binding InvoiceId}"/>
+                            <DataGridTextColumn Header="Patient"
+                                                Width="*"
+                                                Binding="{Binding PatientName}"/>
+                            <DataGridTextColumn Header="Doctor"
+                                                Width="*"
+                                                Binding="{Binding DoctorName}"/>
+                            <DataGridTextColumn Header="Released"
+                                                Width="*"
+                                                Binding="{Binding ReleaseDate, StringFormat={}{0:MMM dd, yyyy}}"/>
+                            <DataGridTextColumn Header="Amount Due"
+                                                Width="*"
+                                                Binding="{Binding Total, StringFormat={}{0:C}}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+
+                <TabItem Header="Paid" Padding="16,10">
+                    <DataGrid x:Name="PaidInvoicesGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              IsReadOnly="True"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal"
+                              AlternatingRowBackground="#F8F9FA"
+                              RowHeight="44"
+                              SelectionChanged="PaidInvoicesGrid_SelectionChanged">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Invoice #"
+                                                Width="Auto"
+                                                Binding="{Binding InvoiceId}"/>
+                            <DataGridTextColumn Header="Patient"
+                                                Width="*"
+                                                Binding="{Binding PatientName}"/>
+                            <DataGridTextColumn Header="Doctor"
+                                                Width="*"
+                                                Binding="{Binding DoctorName}"/>
+                            <DataGridTextColumn Header="Paid"
+                                                Width="*"
+                                                Binding="{Binding PaidDate, StringFormat={}{0:MMM dd, yyyy}}"/>
+                            <DataGridTextColumn Header="Total"
+                                                Width="*"
+                                                Binding="{Binding Total, StringFormat={}{0:C}}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </TabItem>
+            </TabControl>
+        </StackPanel>
+
+        <Border Grid.Column="2"
+                BorderBrush="#DEE2E6"
                 BorderThickness="1"
-                CornerRadius="0,0,5,5"
-                Padding="15">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+                CornerRadius="6"
+                Padding="22">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock x:Name="InvoiceTitleTextBlock"
+                               Text="Select an invoice"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               Foreground="#2C3E50"
+                               Margin="0,0,0,12"/>
 
-                <!-- Control Bar -->
-                <Grid Grid.Row="0" Margin="0,0,0,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                    <Border x:Name="InvoiceStatusBadge"
+                            Background="#FFF3CD"
+                            BorderBrush="#FFECB5"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Padding="10,4"
+                            Margin="0,0,0,16"
+                            Visibility="Collapsed">
+                        <TextBlock x:Name="InvoiceStatusTextBlock"
+                                   Foreground="#7A5E00"
+                                   FontWeight="SemiBold"/>
+                    </Border>
 
-                    <StackPanel Grid.Column="0" Orientation="Horizontal">
-                        <TextBlock Text="Show " VerticalAlignment="Center"/>
-                        <ComboBox Width="70" SelectedIndex="0" Margin="5,0">
-                            <ComboBoxItem Content="10"/>
-                            <ComboBoxItem Content="25"/>
-                            <ComboBoxItem Content="50"/>
-                        </ComboBox>
-                        <TextBlock Text=" entries" VerticalAlignment="Center" Margin="5,0,0,0"/>
-                    </StackPanel>
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-                    <StackPanel Grid.Column="2" Orientation="Horizontal">
-                        <TextBlock Text="Search: " VerticalAlignment="Center" Margin="0,0,5,0"/>
-                        <TextBox Width="300" Padding="5"/>
-                    </StackPanel>
-                </Grid>
+                        <TextBlock Text="Patient" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Row="1" Text="Doctor" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Row="2" Text="Contact" FontWeight="SemiBold"/>
 
-                <!-- DataGrid -->
-                <DataGrid Grid.Row="1" 
-                          AutoGenerateColumns="False"
-                          CanUserAddRows="False"
-                          CanUserDeleteRows="False"
-                          IsReadOnly="True"
-                          HeadersVisibility="Column"
-                          GridLinesVisibility="Horizontal"
-                          AlternatingRowBackground="#F8F9FA"
-                          RowHeight="50">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Invoice No." 
-                                            Width="*"
-                                            Binding="{Binding InvoiceNo}"/>
-                        <DataGridTextColumn Header="Name" 
-                                            Width="*"
-                                            Binding="{Binding Name}"/>
-                        <DataGridTextColumn Header="Contact" 
-                                            Width="*"
-                                            Binding="{Binding Contact}"/>
-                        <DataGridTextColumn Header="Address" 
-                                            Width="2*"
-                                            Binding="{Binding Address}"/>
-                        <DataGridTemplateColumn Header="View Profile" Width="Auto">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button Content="??" 
-                                            Background="#0D6EFD"
-                                            Foreground="White"
-                                            Padding="15,8"
-                                            BorderThickness="0"
-                                            Cursor="Hand"
-                                            Margin="5,0"
-                                            FontSize="16"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Header="Invoice" Width="Auto">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button Content="??" 
-                                            Background="#6C757D"
-                                            Foreground="White"
-                                            Padding="15,8"
-                                            BorderThickness="0"
-                                            Cursor="Hand"
-                                            Margin="5,0"
-                                            FontSize="16"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Header="Mark Paid" Width="Auto">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button Content="?" 
-                                            Background="#28A745"
-                                            Foreground="White"
-                                            Padding="15,8"
-                                            BorderThickness="0"
-                                            Cursor="Hand"
-                                            Margin="5,0"
-                                            FontSize="18"
-                                            FontWeight="Bold"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+                        <TextBlock x:Name="PatientValueTextBlock"
+                                   Grid.Column="1"
+                                   Text="-"/>
+                        <TextBlock x:Name="DoctorValueTextBlock"
+                                   Grid.Column="1"
+                                   Grid.Row="1"
+                                   Text="-"/>
+                        <TextBlock x:Name="ContactValueTextBlock"
+                                   Grid.Column="1"
+                                   Grid.Row="2"
+                                   Text="-"/>
+                    </Grid>
 
-                <!-- Pagination Bar -->
-                <Grid Grid.Row="2" Margin="0,10,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Column="0" 
-                               Text="Showing 1 to 3 of 3 entries" 
-                               VerticalAlignment="Center"/>
+                        <TextBlock Text="Admit Date" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Row="1" Text="Release Date" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Row="2" Text="Length of Stay" FontWeight="SemiBold"/>
 
-                    <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <Button Content="Previous" 
-                                Padding="10,5" 
-                                Margin="0,0,5,0"
-                                IsEnabled="False"/>
-                        <Button Content="1" 
-                                Padding="10,5" 
+                        <TextBlock x:Name="AdmitDateTextBlock"
+                                   Grid.Column="1"
+                                   Text="-"/>
+                        <TextBlock x:Name="ReleaseDateTextBlock"
+                                   Grid.Column="1"
+                                   Grid.Row="1"
+                                   Text="-"/>
+                        <TextBlock x:Name="DaysStayedTextBlock"
+                                   Grid.Column="1"
+                                   Grid.Row="2"
+                                   Text="-"/>
+                    </Grid>
+
+                    <Border BorderBrush="#DEE2E6"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="18"
+                            Margin="0,0,0,20">
+                        <StackPanel>
+                            <TextBlock Text="Charge Breakdown"
+                                       FontWeight="Bold"
+                                       Margin="0,0,0,10"/>
+                            <UniformGrid Columns="2">
+                                <TextBlock Text="Room Charge"/>
+                                <TextBlock x:Name="RoomChargeTextBlock" Text="-" TextAlignment="Right"/>
+                                <TextBlock Text="Doctor Fee"/>
+                                <TextBlock x:Name="DoctorFeeTextBlock" Text="-" TextAlignment="Right"/>
+                                <TextBlock Text="Medicine Cost"/>
+                                <TextBlock x:Name="MedicineCostTextBlock" Text="-" TextAlignment="Right"/>
+                                <TextBlock Text="Other Charges"/>
+                                <TextBlock x:Name="OtherChargeTextBlock" Text="-" TextAlignment="Right"/>
+                            </UniformGrid>
+                            <Separator Margin="0,12"/>
+                            <TextBlock x:Name="TotalAmountTextBlock"
+                                       Text="Total: -"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       TextAlignment="Right"/>
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button x:Name="MarkAsPaidButton"
+                                Content="Mark as Paid"
+                                Background="#198754"
+                                Foreground="White"
+                                Padding="26,10"
+                                FontSize="16"
+                                FontWeight="SemiBold"
+                                BorderThickness="0"
+                                Cursor="Hand"
+                                Margin="0,0,12,0"
+                                Visibility="Collapsed"
+                                Click="MarkAsPaidButton_Click"/>
+                        <Button x:Name="DownloadInvoiceButton"
+                                Content="Export Summary"
                                 Background="#0D6EFD"
                                 Foreground="White"
-                                BorderThickness="0"/>
-                        <Button Content="Next" 
-                                Padding="10,5"
-                                Margin="5,0,0,0"
-                                IsEnabled="False"/>
+                                Padding="26,10"
+                                FontSize="16"
+                                FontWeight="SemiBold"
+                                BorderThickness="0"
+                                Cursor="Hand"
+                                Visibility="Collapsed"
+                                Click="DownloadInvoiceButton_Click"/>
                     </StackPanel>
-                </Grid>
-            </Grid>
+                </StackPanel>
+            </ScrollViewer>
         </Border>
     </Grid>
 </UserControl>

@@ -27,7 +27,8 @@
                     FontWeight="SemiBold"
                     BorderThickness="0"
                     Cursor="Hand"
-                    HorizontalAlignment="Right"/>
+                    HorizontalAlignment="Right"
+                    Click="AddDoctorButton_Click"/>
         </Grid>
 
         <!-- TabControl -->

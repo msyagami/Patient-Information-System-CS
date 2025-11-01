@@ -22,5 +22,6 @@ namespace Patient_Information_System_CS.Models
         public DateTime? PaidDate { get; set; }
 
         public int Total => RoomCharge + DoctorFee + MedicineCost + OtherCharge;
+        public string StatusDisplay => IsPaid ? "Paid" : "Pending";
     }
 }

@@ -85,12 +85,12 @@ namespace Patient_Information_System_CS.ViewModels
                 // Doctor Views
                 "Dashboard" when IsDoctorRole => new Views.Doctor.DoctorDashboardView(),
                 "Patient" when IsDoctorRole => new Views.Doctor.PatientView(),
-                "Appointments" when IsDoctorRole => new Views.Doctor.DoctorAppointmentsView(),
+                "Appointments" when IsDoctorRole => new Views.Doctor.DoctorAppointmentsView(CurrentUser),
 
                 // Patient Views
                 "Dashboard" when IsPatientRole => new Views.Patient.PatientDashboardView(),
-                "Appointments" when IsPatientRole => new Views.Patient.PatientAppointmentsView(),
-                "Discharge" when IsPatientRole => new Views.Patient.DischargeView(),
+                "Appointments" when IsPatientRole => new Views.Patient.PatientAppointmentsView(CurrentUser),
+                "Discharge" when IsPatientRole => new Views.Patient.DischargeView(CurrentUser),
                 "Insurance" when IsPatientRole => new Views.Patient.InsuranceView(),
 
                 // Staff/Receptionist Views
@@ -98,8 +98,8 @@ namespace Patient_Information_System_CS.ViewModels
                 "Admission" when IsStaffRole => new Views.Staff.ReceptionistAdmissionView(),
                 "Doctors" when IsStaffRole => new Views.Staff.ReceptionistDoctorsView(),
                 "Patients" when IsStaffRole => new Views.Staff.ReceptionistPatientsView(),
-                "Appointments" when IsStaffRole => new Views.Staff.ReceptionistAppointmentsView(),
-                "Billing/Invoice" when IsStaffRole => new Views.Staff.ReceptionistBillingInvoiceView(),
+                "Appointments" when IsStaffRole => new Views.Staff.ReceptionistAppointmentsView(CurrentUser),
+                "Billing/Invoice" when IsStaffRole => new Views.Staff.ReceptionistBillingInvoiceView(CurrentUser),
 
                 _ => new Views.Admin.AdminDashboardView() // Default
             };

@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Patient_Information_System_CS.Models;
 using Patient_Information_System_CS.Services;
+using Patient_Information_System_CS.Views.Admin.Dialogs;
 
 namespace Patient_Information_System_CS.Views.Admin
 {
@@ -78,6 +79,33 @@ namespace Patient_Information_System_CS.Views.Admin
 
             _dataService.ToggleDoctorAvailability(doctor);
             RefreshTables();
+        }
+
+        private void AddDoctorButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new AddDoctorWindow
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            if (dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            var account = _dataService.CreateDoctorAccount(dialog.FullName,
+                                                           dialog.Email,
+                                                           dialog.ContactNumber,
+                                                           dialog.Department,
+                                                           dialog.LicenseNumber,
+                                                           dialog.Address,
+                                                           dialog.SelectedStatus);
+
+            RefreshTables();
+            MessageBox.Show($"Doctor account for {account.DisplayName} created.",
+                            "Doctor Added",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
         }
     }
 }
