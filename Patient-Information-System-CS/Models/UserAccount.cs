@@ -113,6 +113,15 @@ namespace Patient_Information_System_CS.Models
 
     public class StaffProfile
     {
+        public int StaffId { get; set; }
+        [MaxLength(32)]
+        public string StaffNumber { get; set; } = string.Empty;
+        [MaxLength(64)]
+        public string Department { get; set; } = string.Empty;
+        [MaxLength(64)]
+        public string Specialization { get; set; } = string.Empty;
+        [MaxLength(64)]
+        public string? LicenseNumber { get; set; }
         public bool IsApproved { get; set; }
         [MaxLength(32)]
         public string ContactNumber { get; set; } = string.Empty;
@@ -125,6 +134,8 @@ namespace Patient_Information_System_CS.Models
         public DoctorStatus Status { get; set; } = DoctorStatus.OnHold;
         [MaxLength(64)]
         public string Department { get; set; } = string.Empty;
+        [MaxLength(64)]
+        public string Specialization { get; set; } = string.Empty;
         [MaxLength(32)]
         public string ContactNumber { get; set; } = string.Empty;
         [MaxLength(64)]

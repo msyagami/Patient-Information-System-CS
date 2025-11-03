@@ -49,6 +49,15 @@
                             <DataGridTextColumn Header="Name"
                                                 Width="*"
                                                 Binding="{Binding DisplayName}"/>
+                            <DataGridTextColumn Header="Staff ID"
+                                                Width="1.2*"
+                                                Binding="{Binding StaffProfile.StaffNumber}"/>
+                            <DataGridTextColumn Header="Specialization"
+                                                Width="1.5*"
+                                                Binding="{Binding StaffProfile.Specialization}"/>
+                            <DataGridTextColumn Header="License"
+                                                Width="1.2*"
+                                                Binding="{Binding StaffProfile.LicenseNumber, TargetNullValue=N/A, FallbackValue=N/A}"/>
                             <DataGridTextColumn Header="Role"
                                                 Width="*"
                                                 Binding="{Binding Role}"/>
@@ -98,6 +107,15 @@
                             <DataGridTextColumn Header="Name"
                                                 Width="*"
                                                 Binding="{Binding DisplayName}"/>
+                            <DataGridTextColumn Header="Staff ID"
+                                                Width="1.2*"
+                                                Binding="{Binding StaffProfile.StaffNumber}"/>
+                            <DataGridTextColumn Header="Specialization"
+                                                Width="1.5*"
+                                                Binding="{Binding StaffProfile.Specialization}"/>
+                            <DataGridTextColumn Header="License"
+                                                Width="1.2*"
+                                                Binding="{Binding StaffProfile.LicenseNumber, TargetNullValue=N/A, FallbackValue=N/A}"/>
                             <DataGridTextColumn Header="Email"
                                                 Width="*"
                                                 Binding="{Binding Email}"/>

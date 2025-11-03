@@ -1368,6 +1368,13 @@ namespace Patient_Information_System_CS.Services
                 var hasCompletedOnboarding = staffEntity.SupervisorId.HasValue && staffEntity.SupervisorId > 0;
                 account.StaffProfile = new StaffProfile
                 {
+                    StaffId = staffEntity.StaffId,
+                    StaffNumber = string.IsNullOrWhiteSpace(staffEntity.StaffIdNumber)
+                        ? $"STF-{staffEntity.StaffId:D5}"
+                        : staffEntity.StaffIdNumber,
+                    Department = staffEntity.Department ?? string.Empty,
+                    Specialization = staffEntity.Department ?? string.Empty,
+                    LicenseNumber = null,
                     IsApproved = isActiveStaff,
                     ContactNumber = FormatContact(person.ContactNumber),
                     HasCompletedOnboarding = hasCompletedOnboarding
@@ -1386,6 +1393,7 @@ namespace Patient_Information_System_CS.Services
                     DoctorId = doctorEntity.DoctorId,
                     Status = doctorStatus,
                     Department = doctorEntity.Department,
+                    Specialization = doctorEntity.Specialization,
                     ContactNumber = FormatContact(person.ContactNumber),
                     LicenseNumber = doctorEntity.LicenseNumber,
                     DoctorNumber = string.IsNullOrWhiteSpace(doctorEntity.DoctorIdNumber)
