@@ -21,10 +21,12 @@ namespace Patient_Information_System_CS.Services
                 return AuthenticationResult.Failed("Please enter your username and password.");
             }
 
-            var account = _dataService.Accounts.FirstOrDefault(user =>
-                string.Equals(user.Username, username, StringComparison.OrdinalIgnoreCase));
+            var normalizedUsername = username.Trim();
+            var normalizedPassword = password.Trim();
 
-            if (account is null || !account.PasswordMatches(password.AsSpan()))
+            var account = _dataService.GetAccountByUsername(normalizedUsername);
+
+            if (account is null || !account.PasswordMatches(normalizedPassword.AsSpan()))
             {
                 return AuthenticationResult.Failed("Invalid username or password.");
             }
@@ -66,10 +68,6 @@ namespace Patient_Information_System_CS.Services
                     {
                         return AuthenticationResult.Failed("Your patient account is awaiting approval.");
                     }
-                    if (account.PatientProfile.HasUnpaidBills)
-                    {
-                        return AuthenticationResult.Failed("You have unpaid bills. Please settle them before logging in.");
-                    }
                     break;
 
                 default:
@@ -79,7 +77,7 @@ namespace Patient_Information_System_CS.Services
             return AuthenticationResult.Success(account);
         }
 
-        public IReadOnlyCollection<UserAccount> GetAccounts() => _dataService.Accounts.ToList();
+        public IReadOnlyCollection<UserAccount> GetAccounts() => _dataService.GetAllAccounts().ToList();
     }
 
     public sealed class AuthenticationResult

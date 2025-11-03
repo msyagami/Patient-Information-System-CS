@@ -37,7 +37,7 @@ namespace Patient_Information_System_CS.Views.Admin
 
         private void PopulateDoctorCards()
         {
-            var doctors = _dataService.Accounts.Where(account => account.Role == UserRole.Doctor).ToList();
+            var doctors = _dataService.GetAllDoctors().ToList();
             var activeDoctors = doctors.Count(account => account.DoctorProfile?.Status == DoctorStatus.Available);
             var pendingDoctors = doctors.Count(account => account.DoctorProfile?.Status == DoctorStatus.OnHold);
             var unavailableDoctors = doctors.Count(account => account.DoctorProfile?.Status == DoctorStatus.NotAvailable);
@@ -49,7 +49,7 @@ namespace Patient_Information_System_CS.Views.Admin
 
         private void PopulatePatientCards()
         {
-            var patients = _dataService.Accounts.Where(account => account.Role == UserRole.Patient).ToList();
+            var patients = _dataService.GetAllPatients().ToList();
             var approvedPatients = patients.Count(account => account.PatientProfile?.IsApproved == true);
             var pendingPatients = patients.Count - approvedPatients;
             var admittedPatients = patients.Count(account => account.PatientProfile?.IsCurrentlyAdmitted == true);
@@ -72,18 +72,18 @@ namespace Patient_Information_System_CS.Views.Admin
 
         private void PopulatePatientBreakdown()
         {
-            var patients = _dataService.Accounts.Where(account => account.Role == UserRole.Patient).ToList();
+            var patients = _dataService.GetAllPatients().ToList();
             var approved = patients.Count(account => account.PatientProfile?.IsApproved == true);
             var pending = patients.Count - approved;
             var admitted = patients.Count(account => account.PatientProfile?.IsCurrentlyAdmitted == true);
-            var inactive = patients.Count(account => account.IsActive == false);
+            var discharged = patients.Count(account => account.PatientProfile?.IsApproved == true && account.PatientProfile?.IsCurrentlyAdmitted != true);
 
             var metrics = new List<MetricItem>
             {
                 new("Approved patients", approved.ToString(CultureInfo.InvariantCulture)),
                 new("Pending approval", pending.ToString(CultureInfo.InvariantCulture)),
                 new("Currently admitted", admitted.ToString(CultureInfo.InvariantCulture)),
-                new("Inactive / discharged", inactive.ToString(CultureInfo.InvariantCulture))
+                new("Discharged patients", discharged.ToString(CultureInfo.InvariantCulture))
             };
 
             PatientBreakdownItemsControl.ItemsSource = metrics;
@@ -92,13 +92,13 @@ namespace Patient_Information_System_CS.Views.Admin
                 $"{approved} approved",
                 $"{pending} pending",
                 $"{admitted} admitted",
-                $"{inactive} inactive"
+                $"{discharged} discharged"
             });
         }
 
         private void PopulateAdmissionTrend()
         {
-            var patients = _dataService.Accounts.Where(account => account.Role == UserRole.Patient).ToList();
+            var patients = _dataService.GetAllPatients().ToList();
             var dayRange = Enumerable.Range(0, 7)
                                      .Select(offset => DateTime.Today.AddDays(-offset))
                                      .OrderBy(date => date)
@@ -145,7 +145,7 @@ namespace Patient_Information_System_CS.Views.Admin
 
         private void PopulateRecentPatients()
         {
-            var patients = _dataService.Accounts.Where(account => account.Role == UserRole.Patient).ToList();
+            var patients = _dataService.GetAllPatients().ToList();
             var recent = patients.Where(account => account.PatientProfile?.AdmitDate is not null)
                                  .OrderByDescending(account => account.PatientProfile!.AdmitDate)
                                  .Take(10)
@@ -156,7 +156,7 @@ namespace Patient_Information_System_CS.Views.Admin
                                      Contact = string.IsNullOrWhiteSpace(account.PatientProfile?.ContactNumber) ? "-" : account.PatientProfile!.ContactNumber,
                                      Status = account.PatientProfile?.IsCurrentlyAdmitted == true
                                          ? "Admitted"
-                                         : account.IsActive ? "Active" : "Discharged"
+                                         : account.PatientProfile?.HasUnpaidBills == true ? "Discharged (Pending Bill)" : "Discharged"
                                  })
                                  .ToList();
 

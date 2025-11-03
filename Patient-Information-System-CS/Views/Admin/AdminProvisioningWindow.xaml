@@ -1,0 +1,107 @@
+<Window x:Class="Patient_Information_System_CS.Views.Admin.AdminProvisioningWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        Title="First-Run Administrator Setup"
+        MinHeight="520"
+        MinWidth="640"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        Background="#F5F6FA">
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+        <Border Margin="20"
+                CornerRadius="8"
+                Background="White"
+                Padding="24"
+                BorderBrush="#CED4DA"
+                BorderThickness="1">
+            <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Margin="0,0,0,16">
+                <TextBlock Text="Welcome to Patient Information System"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           Foreground="#1F2937"/>
+                <TextBlock Text="Let's create the first administrator account before continuing."
+                           Margin="0,8,0,0"
+                           Foreground="#4B5563"/>
+            </StackPanel>
+
+            <Grid Grid.Row="1" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="Username" FontWeight="SemiBold"/>
+                        <TextBox x:Name="UsernameTextBox" Height="34" Padding="8"/>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="Password" FontWeight="SemiBold"/>
+                        <PasswordBox x:Name="PasswordBox" Height="34" Padding="8"/>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="Confirm Password" FontWeight="SemiBold"/>
+                        <PasswordBox x:Name="ConfirmPasswordBox" Height="34" Padding="8"/>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="Email" FontWeight="SemiBold"/>
+                        <TextBox x:Name="EmailTextBox" Height="34" Padding="8"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Contact Number" FontWeight="SemiBold"/>
+                        <TextBox x:Name="ContactNumberTextBox" Height="34" Padding="8"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="Given Name" FontWeight="SemiBold"/>
+                        <TextBox x:Name="GivenNameTextBox" Height="34" Padding="8"/>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="Last Name" FontWeight="SemiBold"/>
+                        <TextBox x:Name="LastNameTextBox" Height="34" Padding="8"/>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="Middle Name" FontWeight="SemiBold"/>
+                        <TextBox x:Name="MiddleNameTextBox" Height="34" Padding="8"/>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="Birth Date" FontWeight="SemiBold"/>
+                        <DatePicker x:Name="BirthDatePicker" Height="34" Padding="4" SelectedDate="{x:Static System:DateTime.Today}"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Address" FontWeight="SemiBold"/>
+                        <TextBox x:Name="AddressTextBox" Height="34" Padding="8"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Grid.Row="2" Orientation="Vertical">
+                <TextBlock x:Name="FeedbackTextBlock"
+                           Foreground="#DC2626"
+                           Visibility="Collapsed"
+                           Margin="0,0,0,12"
+                           TextWrapping="Wrap"/>
+                <Button Content="Create Administrator"
+                        Height="44"
+                        Background="#2563EB"
+                        Foreground="White"
+                        FontWeight="SemiBold"
+                        BorderThickness="0"
+                        Click="CreateAdministrator_Click"/>
+            </StackPanel>
+        </Grid>
+        </Border>
+    </ScrollViewer>
+</Window>

@@ -1,9 +1,9 @@
 <UserControl x:Class="Patient_Information_System_CS.Views.Doctor.DoctorDashboardView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="1000"
              Background="White">
     <Grid Margin="20">
@@ -13,204 +13,135 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Summary Cards -->
-        <UniformGrid Grid.Row="0" Columns="3" Margin="0,0,0,20">
-            
-            <!-- Card 1: Your Appointments -->
-            <Border Background="#DC3545" 
+        <UniformGrid Grid.Row="0"
+                     Columns="3"
+                     Margin="0,0,0,20">
+            <Border Background="#1E293B"
                     Margin="0,0,10,0"
-                    Padding="30"
-                    CornerRadius="5">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                        <TextBlock Text="1" 
-                                   FontSize="48" 
-                                   FontWeight="Bold"
-                                   Foreground="White"/>
-                        <TextBlock Text="Your Appointments" 
-                                   FontSize="16"
-                                   Foreground="White"
-                                   Margin="0,5,0,0"/>
-                    </StackPanel>
-                    
-                    <Ellipse Grid.Column="1" 
-                             Width="60" 
-                             Height="60"
-                             Fill="White"
-                             VerticalAlignment="Center"/>
-                </Grid>
+                    Padding="24"
+                    CornerRadius="6">
+                <StackPanel>
+                    <TextBlock x:Name="DoctorAppointmentsValueTextBlock"
+                               FontSize="40"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               Text="0"/>
+                    <TextBlock Text="Upcoming appointments"
+                               FontSize="14"
+                               Foreground="White"
+                               Margin="0,8,0,0"/>
+                    <TextBlock x:Name="DoctorAppointmentsSubtitleTextBlock"
+                               FontSize="12"
+                               Foreground="#E2E8F0"
+                               Text="0 scheduled today"/>
+                </StackPanel>
             </Border>
 
-            <!-- Card 2: Patient Under You -->
-            <Border Background="#495057" 
+            <Border Background="#047857"
                     Margin="5,0,5,0"
-                    Padding="30"
-                    CornerRadius="5">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                        <TextBlock Text="3" 
-                                   FontSize="48" 
-                                   FontWeight="Bold"
-                                   Foreground="White"/>
-                        <TextBlock Text="Patient Under You" 
-                                   FontSize="16"
-                                   Foreground="White"
-                                   Margin="0,5,0,0"/>
-                    </StackPanel>
-                    
-                    <Ellipse Grid.Column="1" 
-                             Width="60" 
-                             Height="60"
-                             Fill="White"
-                             VerticalAlignment="Center"/>
-                </Grid>
+                    Padding="24"
+                    CornerRadius="6">
+                <StackPanel>
+                    <TextBlock x:Name="DoctorPatientsValueTextBlock"
+                               FontSize="40"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               Text="0"/>
+                    <TextBlock Text="Active patients"
+                               FontSize="14"
+                               Foreground="White"
+                               Margin="0,8,0,0"/>
+                    <TextBlock x:Name="DoctorPatientsSubtitleTextBlock"
+                               FontSize="12"
+                               Foreground="#D1FAE5"
+                               Text="0 currently admitted"/>
+                </StackPanel>
             </Border>
 
-            <!-- Card 3: Discharged Patient -->
-            <Border Background="#0D6EFD" 
+            <Border Background="#7C3AED"
                     Margin="10,0,0,0"
-                    Padding="30"
-                    CornerRadius="5">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                        <TextBlock Text="0" 
-                                   FontSize="48" 
-                                   FontWeight="Bold"
-                                   Foreground="White"/>
-                        <TextBlock Text="Discharged Patient" 
-                                   FontSize="16"
-                                   Foreground="White"
-                                   Margin="0,5,0,0"/>
-                    </StackPanel>
-                    
-                    <Ellipse Grid.Column="1" 
-                             Width="60" 
-                             Height="60"
-                             Fill="White"
-                             VerticalAlignment="Center"/>
-                </Grid>
+                    Padding="24"
+                    CornerRadius="6">
+                <StackPanel>
+                    <TextBlock x:Name="DoctorDischargedValueTextBlock"
+                               FontSize="40"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               Text="0"/>
+                    <TextBlock Text="Recent discharges"
+                               FontSize="14"
+                               Foreground="White"
+                               Margin="0,8,0,0"/>
+                    <TextBlock x:Name="DoctorDischargedSubtitleTextBlock"
+                               FontSize="12"
+                               Foreground="#EDE9FE"
+                               Text="Past 30 days"/>
+                </StackPanel>
             </Border>
-            
         </UniformGrid>
 
-        <!-- Upcoming Appointments Title -->
-        <Border Grid.Row="1" 
-                Background="#0D6EFD" 
-                Padding="15"
-                CornerRadius="5,5,0,0"
-                Margin="0,0,0,0">
-            <TextBlock Text="Upcoming Appointments For You" 
-                       FontSize="18" 
+        <Border Grid.Row="1"
+                Background="#0D6EFD"
+                Padding="16"
+                CornerRadius="6,6,0,0">
+            <TextBlock Text="Upcoming appointments"
+                       FontSize="18"
                        FontWeight="Bold"
-                       Foreground="White"
-                       HorizontalAlignment="Center"/>
+                       Foreground="White"/>
         </Border>
 
-        <!-- Appointments DataGrid Section -->
-        <Border Grid.Row="2" 
-                BorderBrush="#DEE2E6" 
+        <Border Grid.Row="2"
+                BorderBrush="#E2E8F0"
                 BorderThickness="1"
-                CornerRadius="0,0,5,5"
-                Padding="15">
+                CornerRadius="0,0,6,6"
+                Padding="16">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Control Bar -->
-                <Grid Grid.Row="0" Margin="0,0,0,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                <StackPanel Grid.Row="0">
+                    <TextBlock x:Name="AppointmentsEmptyTextBlock"
+                               Text="No upcoming appointments scheduled."
+                               FontSize="14"
+                               Foreground="#4B5563"
+                               HorizontalAlignment="Center"
+                               Margin="0,20,0,20"
+                               Visibility="Collapsed"/>
 
-                    <StackPanel Grid.Column="0" Orientation="Horizontal">
-                        <TextBlock Text="Show " VerticalAlignment="Center"/>
-                        <ComboBox Width="70" SelectedIndex="0" Margin="5,0">
-                            <ComboBoxItem Content="10"/>
-                            <ComboBoxItem Content="25"/>
-                            <ComboBoxItem Content="50"/>
-                        </ComboBox>
-                        <TextBlock Text=" entries" VerticalAlignment="Center" Margin="5,0,0,0"/>
-                    </StackPanel>
+                    <DataGrid x:Name="UpcomingAppointmentsDataGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              IsReadOnly="True"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal"
+                              AlternatingRowBackground="#F8F9FA"
+                              RowHeight="40"
+                              Margin="0,0,0,10">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="When"
+                                                Width="2*"
+                                                Binding="{Binding ScheduledFor}"/>
+                            <DataGridTextColumn Header="Patient"
+                                                Width="2*"
+                                                Binding="{Binding PatientName}"/>
+                            <DataGridTextColumn Header="Status"
+                                                Width="*"
+                                                Binding="{Binding Status}"/>
+                            <DataGridTextColumn Header="Notes"
+                                                Width="2*"
+                                                Binding="{Binding Description}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
 
-                    <StackPanel Grid.Column="2" Orientation="Horizontal">
-                        <TextBlock Text="Search: " VerticalAlignment="Center" Margin="0,0,5,0"/>
-                        <TextBox Width="200" Padding="5"/>
-                    </StackPanel>
-                </Grid>
-
-                <!-- DataGrid -->
-                <DataGrid Grid.Row="1" 
-                          AutoGenerateColumns="False"
-                          CanUserAddRows="False"
-                          CanUserDeleteRows="False"
-                          IsReadOnly="True"
-                          HeadersVisibility="Column"
-                          GridLinesVisibility="Horizontal"
-                          AlternatingRowBackground="#F8F9FA"
-                          RowHeight="40">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Appointment Date" 
-                                            Width="2*"
-                                            Binding="{Binding AppointmentDate}"/>
-                        <DataGridTextColumn Header="Patient Name" 
-                                            Width="2*"
-                                            Binding="{Binding PatientName}"/>
-                        <DataGridTextColumn Header="Description" 
-                                            Width="2*"
-                                            Binding="{Binding Description}"/>
-                        <DataGridTextColumn Header="Contact" 
-                                            Width="*"
-                                            Binding="{Binding Contact}"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-
-                <!-- Pagination Bar -->
-                <Grid Grid.Row="2" Margin="0,10,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Grid.Column="0" 
-                               Text="Showing 1 to 1 of 1 entries" 
-                               VerticalAlignment="Center"/>
-
-                    <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <Button Content="Previous" 
-                                Padding="10,5" 
-                                Margin="0,0,5,0"
-                                IsEnabled="False"/>
-                        <Button Content="1" 
-                                Padding="10,5" 
-                                Margin="0,0,5,0"
-                                Background="#0D6EFD"
-                                Foreground="White"
-                                BorderThickness="0"/>
-                        <Button Content="Next" 
-                                Padding="10,5"
-                                IsEnabled="False"/>
-                    </StackPanel>
-                </Grid>
+                <TextBlock x:Name="AppointmentsSummaryTextBlock"
+                           Grid.Row="1"
+                           FontSize="12"
+                           Foreground="#6B7280"
+                           Text=""/>
             </Grid>
         </Border>
     </Grid>

@@ -20,7 +20,19 @@ namespace Patient_Information_System_CS.Views.Admin
         private void AdmissionView_Loaded(object sender, RoutedEventArgs e)
         {
             PopulateDoctors();
+            PopulateRooms();
             RefreshTables();
+        }
+
+        private void PopulateRooms()
+        {
+            var rooms = _dataService.GetRoomOptions();
+            RoomComboBox.ItemsSource = rooms;
+
+            if (rooms.Count > 0 && RoomComboBox.SelectedIndex < 0)
+            {
+                RoomComboBox.SelectedIndex = 0;
+            }
         }
 
         private void PopulateDoctors()
@@ -112,9 +124,9 @@ namespace Patient_Information_System_CS.Views.Admin
 
         private string GetRoomSelection()
         {
-            if (RoomComboBox.SelectedItem is ComboBoxItem item && item.Content is string content)
+            if (RoomComboBox.SelectedItem is RoomOption room)
             {
-                return content;
+                return room.DisplayLabel;
             }
 
             return RoomComboBox.Text switch

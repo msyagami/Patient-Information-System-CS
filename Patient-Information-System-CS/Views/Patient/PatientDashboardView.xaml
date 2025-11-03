@@ -1,158 +1,145 @@
 <UserControl x:Class="Patient_Information_System_CS.Views.Patient.PatientDashboardView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              Background="White">
-    <Grid>
+    <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Notification Bar -->
-        <Border Grid.Row="0" 
-                Background="LightBlue" 
-                Padding="15,10"
-                Margin="10,10,10,5">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                
-                <TextBlock Grid.Column="0" 
-                           Text="Your appointment request is currently under review." 
-                           VerticalAlignment="Center"
-                           FontSize="14"/>
-                
-                <Button Grid.Column="1" 
-                        Content="?" 
-                        Background="Transparent"
-                        BorderThickness="0"
-                        FontSize="16"
-                        FontWeight="Bold"
-                        Cursor="Hand"
-                        Padding="10,0"/>
-            </Grid>
+        <Border x:Name="NotificationBorder"
+                Grid.Row="0"
+                Background="#DBEAFE"
+                Padding="16"
+                Margin="10,10,10,5"
+                CornerRadius="6"
+                Visibility="Collapsed">
+            <TextBlock x:Name="NotificationTextBlock"
+                       FontSize="14"
+                       Foreground="#1F2937"
+                       TextWrapping="Wrap"
+                       Text="Welcome to your patient dashboard."/>
         </Border>
 
-        <!-- Summary Cards Grid -->
-        <UniformGrid Grid.Row="1" 
-                     Rows="2" 
-                     Columns="3" 
+        <UniformGrid Grid.Row="1"
+                     Rows="2"
+                     Columns="3"
                      Margin="10">
-            
-            <!-- Card 1: Doctor Name -->
-            <Border Background="#DC3545" 
+            <Border Background="#1E3A8A"
                     Margin="5"
                     Padding="20"
-                    CornerRadius="5">
+                    CornerRadius="6">
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="Neuvillette Dragon" 
-                               FontSize="24" 
+                    <TextBlock x:Name="DoctorNameTextBlock"
+                               FontSize="22"
                                FontWeight="Bold"
                                Foreground="White"
+                               Text="Unassigned"
                                TextWrapping="Wrap"/>
-                    <TextBlock Text="Doctor Name" 
-                               FontSize="14"
+                    <TextBlock Text="Primary doctor"
+                               FontSize="13"
                                Foreground="White"
                                Margin="0,10,0,0"/>
                 </StackPanel>
             </Border>
 
-            <!-- Card 2: Symptoms -->
-            <Border Background="#6C5B28" 
+            <Border Background="#6C5B28"
                     Margin="5"
                     Padding="20"
-                    CornerRadius="5">
+                    CornerRadius="6">
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="Heart Palpation" 
-                               FontSize="24" 
+                    <TextBlock x:Name="DoctorDepartmentTextBlock"
+                               FontSize="22"
                                FontWeight="Bold"
                                Foreground="White"
+                               Text="Not specified"
                                TextWrapping="Wrap"/>
-                    <TextBlock Text="Symptoms" 
-                               FontSize="14"
+                    <TextBlock Text="Department"
+                               FontSize="13"
                                Foreground="White"
                                Margin="0,10,0,0"/>
                 </StackPanel>
             </Border>
 
-            <!-- Card 3: Admit Date -->
-            <Border Background="#0D6EFD" 
+            <Border Background="#047857"
                     Margin="5"
                     Padding="20"
-                    CornerRadius="5">
+                    CornerRadius="6">
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="Feb. 10, 2024" 
-                               FontSize="24" 
+                    <TextBlock x:Name="DoctorStatusTextBlock"
+                               FontSize="22"
                                FontWeight="Bold"
                                Foreground="White"
+                               Text="Status pending"
                                TextWrapping="Wrap"/>
-                    <TextBlock Text="Admit Date" 
-                               FontSize="14"
+                    <TextBlock Text="Doctor status"
+                               FontSize="13"
                                Foreground="White"
                                Margin="0,10,0,0"/>
                 </StackPanel>
             </Border>
 
-            <!-- Card 4: Doctor Status -->
-            <Border Background="#DC3545" 
+            <Border Background="#7C3AED"
                     Margin="5"
                     Padding="20"
-                    CornerRadius="5">
+                    CornerRadius="6">
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="Currently Available" 
-                               FontSize="24" 
+                    <TextBlock x:Name="NextAppointmentValueTextBlock"
+                               FontSize="22"
                                FontWeight="Bold"
                                Foreground="White"
+                               Text="No upcoming visits"
                                TextWrapping="Wrap"/>
-                    <TextBlock Text="Doctor Status" 
-                               FontSize="14"
+                    <TextBlock x:Name="NextAppointmentStatusTextBlock"
+                               FontSize="13"
                                Foreground="White"
-                               Margin="0,10,0,0"/>
+                               Margin="0,10,0,0"
+                               Text="Status: Pending"/>
                 </StackPanel>
             </Border>
 
-            <!-- Card 5: Doctor Department -->
-            <Border Background="#6C5B28" 
+            <Border Background="#0D6EFD"
                     Margin="5"
                     Padding="20"
-                    CornerRadius="5">
+                    CornerRadius="6">
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="Cardiologist" 
-                               FontSize="24" 
+                    <TextBlock x:Name="AdmissionStatusTextBlock"
+                               FontSize="22"
                                FontWeight="Bold"
                                Foreground="White"
+                               Text="Admitted"
                                TextWrapping="Wrap"/>
-                    <TextBlock Text="Doctor Department" 
-                               FontSize="14"
+                    <TextBlock x:Name="AdmissionRoomTextBlock"
+                               FontSize="13"
                                Foreground="White"
-                               Margin="0,10,0,0"/>
+                               Margin="0,10,0,0"
+                               Text="Room assignment pending"/>
                 </StackPanel>
             </Border>
 
-            <!-- Card 6: Appointment Status -->
-            <Border Background="#0D6EFD" 
+            <Border Background="#DC2626"
                     Margin="5"
                     Padding="20"
-                    CornerRadius="5">
+                    CornerRadius="6">
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="Currently Pending" 
-                               FontSize="24" 
+                    <TextBlock x:Name="PendingBillAmountTextBlock"
+                               FontSize="22"
                                FontWeight="Bold"
                                Foreground="White"
+                               Text="$0.00"
                                TextWrapping="Wrap"/>
-                    <TextBlock Text="Appointment Status" 
-                               FontSize="14"
+                    <TextBlock x:Name="PendingBillStatusTextBlock"
+                               FontSize="13"
                                Foreground="White"
-                               Margin="0,10,0,0"/>
+                               Margin="0,10,0,0"
+                               Text="Outstanding balance"/>
                 </StackPanel>
             </Border>
-            
         </UniformGrid>
     </Grid>
 </UserControl>

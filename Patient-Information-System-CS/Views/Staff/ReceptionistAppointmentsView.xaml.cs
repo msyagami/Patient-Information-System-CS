@@ -13,34 +13,91 @@ namespace Patient_Information_System_CS.Views.Staff
     {
         private readonly HospitalDataService _dataService = HospitalDataService.Instance;
         private readonly UserAccount? _staffAccount;
+        private bool _appointmentsSubscribed;
+        private bool _admissionsSubscribed;
 
         public ReceptionistAppointmentsView(UserAccount? staffAccount)
         {
             _staffAccount = staffAccount;
             InitializeComponent();
             Loaded += ReceptionistAppointmentsView_Loaded;
+            Unloaded += ReceptionistAppointmentsView_Unloaded;
         }
 
         private void ReceptionistAppointmentsView_Loaded(object sender, RoutedEventArgs e)
         {
+            if (!_appointmentsSubscribed)
+            {
+                _dataService.AppointmentsChanged += OnAppointmentsChanged;
+                _appointmentsSubscribed = true;
+            }
+
+            if (!_admissionsSubscribed)
+            {
+                _dataService.AdmissionsChanged += OnAdmissionsChanged;
+                _admissionsSubscribed = true;
+            }
+
             PopulateSelectors();
             RefreshTables();
         }
 
+        private void ReceptionistAppointmentsView_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (_appointmentsSubscribed)
+            {
+                _dataService.AppointmentsChanged -= OnAppointmentsChanged;
+                _appointmentsSubscribed = false;
+            }
+
+            if (_admissionsSubscribed)
+            {
+                _dataService.AdmissionsChanged -= OnAdmissionsChanged;
+                _admissionsSubscribed = false;
+            }
+        }
+
         private void PopulateSelectors()
         {
+            var selectedPatientId = (PatientComboBox.SelectedItem as UserAccount)?.UserId;
+            var selectedDoctorId = (DoctorComboBox.SelectedItem as UserAccount)?.UserId;
+
             var patients = _dataService.GetSchedulablePatients().ToList();
             PatientComboBox.ItemsSource = patients;
             if (patients.Count > 0)
             {
-                PatientComboBox.SelectedIndex = 0;
+                if (selectedPatientId is int patientId)
+                {
+                    var match = patients.FirstOrDefault(account => account.UserId == patientId);
+                    if (match is not null)
+                    {
+                        PatientComboBox.SelectedItem = match;
+                    }
+                }
+
+                if (PatientComboBox.SelectedItem is null)
+                {
+                    PatientComboBox.SelectedIndex = 0;
+                }
             }
 
             var doctors = _dataService.GetActiveDoctors().Concat(_dataService.GetUnavailableDoctors()).ToList();
             DoctorComboBox.ItemsSource = doctors;
             if (doctors.Count > 0)
             {
-                DoctorComboBox.SelectedIndex = 0;
+                if (selectedDoctorId is int doctorId)
+                {
+                    var match = doctors.FirstOrDefault(account => account.UserId == doctorId);
+                    if (match is not null)
+                    {
+                        DoctorComboBox.SelectedItem = match;
+                    }
+                }
+
+                if (DoctorComboBox.SelectedItem is null)
+                {
+                    DoctorComboBox.SelectedIndex = 0;
+                }
             }
         }
 
@@ -56,6 +113,28 @@ namespace Patient_Information_System_CS.Views.Staff
             };
 
             AllAppointmentsGrid.ItemsSource = _dataService.GetAllAppointments().ToList();
+        }
+
+        private void OnAppointmentsChanged(object? sender, EventArgs e)
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(RefreshTables);
+                return;
+            }
+
+            RefreshTables();
+        }
+
+        private void OnAdmissionsChanged(object? sender, EventArgs e)
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(PopulateSelectors);
+                return;
+            }
+
+            PopulateSelectors();
         }
 
         private void ScheduleButton_Click(object sender, RoutedEventArgs e)

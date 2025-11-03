@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Patient_Information_System_CS.Models;
 using Patient_Information_System_CS.Services;
+using Patient_Information_System_CS.Views.Admin;
 
 namespace Patient_Information_System_CS
 {
@@ -21,7 +22,42 @@ namespace Patient_Information_System_CS
             InitializeComponent();
             _dataService = HospitalDataService.Instance;
             _authenticationService = new AuthenticationService(_dataService);
-            Loaded += (_, _) => UsernameTextBox.Focus();
+            Loaded += OnLoaded;
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (!EnsureAdministratorProvisioned())
+            {
+                return;
+            }
+
+            UsernameTextBox.Focus();
+        }
+
+        private bool EnsureAdministratorProvisioned()
+        {
+            if (!_dataService.RequiresAdminProvisioning())
+            {
+                return true;
+            }
+
+            var provisioningWindow = new AdminProvisioningWindow(_dataService)
+            {
+                Owner = this
+            };
+
+            var result = provisioningWindow.ShowDialog();
+            if (result != true || provisioningWindow.CreatedAccount is null)
+            {
+                Close();
+                return false;
+            }
+
+            UsernameTextBox.Text = provisioningWindow.CreatedAccount.Username;
+            PasswordBox.Password = provisioningWindow.PlainPassword;
+            ShowFeedback("Administrator account created. Please sign in with the credentials provided.", isError: false);
+            return true;
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)

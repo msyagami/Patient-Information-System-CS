@@ -83,21 +83,21 @@ namespace Patient_Information_System_CS.ViewModels
                 "Billing/Invoice" when IsAdminRole => new Views.Admin.BillingView(),
 
                 // Doctor Views
-                "Dashboard" when IsDoctorRole => new Views.Doctor.DoctorDashboardView(),
-                "Patient" when IsDoctorRole => new Views.Doctor.PatientView(),
+                "Dashboard" when IsDoctorRole => new Views.Doctor.DoctorDashboardView(CurrentUser),
+                "Patient" when IsDoctorRole => new Views.Doctor.PatientView(CurrentUser),
                 "Appointments" when IsDoctorRole => new Views.Doctor.DoctorAppointmentsView(CurrentUser),
 
                 // Patient Views
-                "Dashboard" when IsPatientRole => new Views.Patient.PatientDashboardView(),
+                "Dashboard" when IsPatientRole => new Views.Patient.PatientDashboardView(CurrentUser),
                 "Appointments" when IsPatientRole => new Views.Patient.PatientAppointmentsView(CurrentUser),
                 "Discharge" when IsPatientRole => new Views.Patient.DischargeView(CurrentUser),
                 "Insurance" when IsPatientRole => new Views.Patient.InsuranceView(),
 
                 // Staff/Receptionist Views
-                "Dashboard" when IsStaffRole => new Views.Staff.ReceptionistDashboardView(),
-                "Admission" when IsStaffRole => new Views.Staff.ReceptionistAdmissionView(),
+                "Dashboard" when IsStaffRole => new Views.Staff.ReceptionistDashboardView(CurrentUser),
+                "Admission" when IsStaffRole => new Views.Staff.ReceptionistAdmissionView(CurrentUser),
                 "Doctors" when IsStaffRole => new Views.Staff.ReceptionistDoctorsView(),
-                "Patients" when IsStaffRole => new Views.Staff.ReceptionistPatientsView(),
+                "Patients" when IsStaffRole => new Views.Staff.ReceptionistPatientsView(CurrentUser),
                 "Appointments" when IsStaffRole => new Views.Staff.ReceptionistAppointmentsView(CurrentUser),
                 "Billing/Invoice" when IsStaffRole => new Views.Staff.ReceptionistBillingInvoiceView(CurrentUser),
 
