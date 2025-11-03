@@ -38,10 +38,10 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Restore dependencies
-        run: dotnet restore Patient-Information-System-CS/Patient-Information-System-CS.sln
+        run: dotnet restore Patient-Information-System-CS.sln
 
       - name: Build solution (Release)
-        run: dotnet build Patient-Information-System-CS/Patient-Information-System-CS.sln --configuration Release --no-restore
+        run: dotnet build Patient-Information-System-CS.sln --configuration Release --no-restore
 
       - name: Run unit tests
         run: dotnet test Tests/HospitalDataService.Tests/HospitalDataService.Tests.csproj --configuration Release --no-build
@@ -50,7 +50,7 @@ jobs:
         run: dotnet run --project SmokeTests/SmokeTests.csproj --configuration Release
 
       - name: Publish release artifacts
-        run: dotnet publish Patient-Information-System-CS/Patient-Information-System-CS/Patient-Information-System-CS.csproj --configuration Release --output build/publish
+        run: dotnet publish Patient-Information-System-CS/Patient-Information-System-CS.csproj --configuration Release --output build/publish
 
       - name: Package artifacts
         shell: pwsh
