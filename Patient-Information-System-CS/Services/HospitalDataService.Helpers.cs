@@ -109,16 +109,21 @@ namespace Patient_Information_System_CS.Services
             return (given, last, middle);
         }
 
-        private static long ParseContactNumber(string contactNumber)
+        private static string ParseContactNumber(string? contactNumber)
         {
+            if (string.IsNullOrWhiteSpace(contactNumber))
+            {
+                return string.Empty;
+            }
+
             var digits = new string(contactNumber.Where(char.IsDigit).ToArray());
-            return long.TryParse(digits, NumberStyles.Integer, CultureInfo.InvariantCulture, out var numeric)
-                ? numeric
-                : 0;
+            return string.IsNullOrWhiteSpace(digits)
+                ? contactNumber.Trim()
+                : digits;
         }
 
-        private static string FormatContact(long contactNumber) =>
-            contactNumber == 0 ? "Not provided" : contactNumber.ToString(CultureInfo.InvariantCulture);
+        private static string FormatContact(string? contactNumber) =>
+            string.IsNullOrWhiteSpace(contactNumber) ? "Not provided" : contactNumber;
 
         private static string FormatFullName(EntityPerson person)
         {

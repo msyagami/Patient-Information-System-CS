@@ -19,7 +19,7 @@ public partial class Person
 
     public string Sex { get; set; } = null!;
 
-    public long ContactNumber { get; set; }
+    public string ContactNumber { get; set; } = null!;
 
     public string Address { get; set; } = null!;
 

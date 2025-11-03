@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Microsoft.Win32;
 using Patient_Information_System_CS.Models;
 using Patient_Information_System_CS.Services;
 
@@ -11,6 +12,7 @@ namespace Patient_Information_System_CS.Views.Admin
     public partial class BillingView : UserControl
     {
         private readonly HospitalDataService _dataService = HospitalDataService.Instance;
+        private readonly PdfExportService _pdfExport = PdfExportService.Instance;
         private BillingRecord? _selectedInvoice;
 
         public BillingView()
@@ -112,7 +114,27 @@ namespace Patient_Information_System_CS.Views.Admin
                 return;
             }
 
-            MessageBox.Show("Exporting invoices will be added in a future update.", "Export not available", MessageBoxButton.OK, MessageBoxImage.Information);
+            var dialog = new SaveFileDialog
+            {
+                Title = "Save Invoice as PDF",
+                FileName = BuildInvoiceFileName(_selectedInvoice) + ".pdf",
+                Filter = "PDF files (*.pdf)|*.pdf"
+            };
+
+            if (dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            try
+            {
+                _pdfExport.ExportInvoice(_selectedInvoice, dialog.FileName);
+                MessageBox.Show("Invoice exported successfully.", "Export complete", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Unable to export invoice. {ex.Message}", "Export failed", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void DisplayInvoiceDetails(BillingRecord? invoice)
@@ -166,6 +188,17 @@ namespace Patient_Information_System_CS.Views.Admin
 
             MarkAsPaidButton.Visibility = invoice.IsPaid ? Visibility.Collapsed : Visibility.Visible;
             DownloadInvoiceButton.Visibility = Visibility.Visible;
+        }
+
+        private static string BuildInvoiceFileName(BillingRecord invoice)
+        {
+            var baseName = $"Invoice_{invoice.InvoiceId}";
+            foreach (var invalidChar in System.IO.Path.GetInvalidFileNameChars())
+            {
+                baseName = baseName.Replace(invalidChar, '_');
+            }
+
+            return baseName;
         }
     }
 }

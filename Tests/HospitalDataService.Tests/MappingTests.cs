@@ -169,8 +169,121 @@ public class MappingTests
         Assert.Equal("639555000111", mapped.ContactNumber);
         Assert.False(mapped.IsPaid);
         Assert.Null(mapped.PaidDate);
-        Assert.Equal(2000, mapped.RoomCharge);
+        Assert.Equal(1999.6m, mapped.RoomCharge);
         Assert.Equal(patientPerson.Address, mapped.Address);
+    }
+
+    [Fact]
+    public void MapUserAccount_ForNurseSummarizesAssignments()
+    {
+        var doctorPerson = BuildPerson(800, "Laura", "Care", "F", 639777100100);
+        var doctor = BuildDoctor(2100, doctorPerson, "General Medicine");
+
+        var nurse = BuildNurse(1800);
+        nurse.RegularStaff = true;
+
+        var sharedRoom = new EntityRoom
+        {
+            RoomId = 4100,
+            RoomNumber = 15,
+            RoomType = "Recovery",
+            Capacity = 4
+        };
+
+        for (var index = 0; index < 6; index++)
+        {
+            var patientPerson = BuildPerson(900 + index, $"Patient{index}", "Test", "F", 639700000000 + index);
+            BuildPatient(2300 + index, patientPerson, doctor, sharedRoom, nurse);
+        }
+
+        var user = new EntityUser
+        {
+            UserId = 5100,
+            Username = "nurse.assignment",
+            Password = "encoded",
+            UserRole = "nurse",
+            AssociatedPersonId = nurse.Person.PersonId,
+            AssociatedPerson = nurse.Person
+        };
+        nurse.Person.Users.Add(user);
+
+        var lookup = Enumerable.Empty<EntityBill>().ToLookup(b => b.AssignedPatientId);
+
+        var account = HospitalDataService.MapUserAccount(user, lookup);
+
+        Assert.Equal(UserRole.Nurse, account.Role);
+        Assert.True(account.IsActive);
+        Assert.NotNull(account.NurseProfile);
+        Assert.Equal(6, account.NurseProfile!.AssignedPatientsCount);
+        Assert.Contains("Patient0 Test", account.NurseProfile.AssignedPatientsSummary);
+        Assert.Contains("Patient4 Test", account.NurseProfile.AssignedPatientsSummary);
+        Assert.Contains("(+1 more)", account.NurseProfile.AssignedPatientsSummary);
+        Assert.Equal(NurseStatus.Available, account.NurseProfile.Status);
+    }
+
+    [Fact]
+    public void MapUserAccount_ForAdminSetsSuperUserFlags()
+    {
+        var adminPerson = BuildPerson(9500, "Morgan", "Root", "F", 639888111000);
+        var adminUser = new EntityUser
+        {
+            UserId = 6100,
+            Username = "admin.root",
+            Password = "encoded",
+            UserRole = "admin",
+            AssociatedPersonId = adminPerson.PersonId,
+            AssociatedPerson = adminPerson
+        };
+        adminPerson.Users.Add(adminUser);
+
+        var lookup = Enumerable.Empty<EntityBill>().ToLookup(b => b.AssignedPatientId);
+
+        var account = HospitalDataService.MapUserAccount(adminUser, lookup);
+
+        Assert.Equal(UserRole.Admin, account.Role);
+        Assert.True(account.IsSuperUser);
+        Assert.True(account.AdminProfile?.IsApproved);
+        Assert.Equal("639888111000", account.AdminProfile?.ContactNumber);
+        Assert.Null(account.StaffProfile);
+    }
+
+    [Fact]
+    public void MapBill_WithBreakdown_ParsesChargesAndNotes()
+    {
+        var patientPerson = BuildPerson(7600, "Alan", "Turing", "M", 639888777333);
+        var doctorPerson = BuildPerson(7601, "Joan", "Clarke", "F", 639111333888);
+        var doctor = BuildDoctor(3200, doctorPerson, "Neurology");
+        var nurse = BuildNurse(3300);
+        var room = new EntityRoom
+        {
+            RoomId = 4300,
+            RoomNumber = 22,
+            RoomType = "ICU",
+            Capacity = 1
+        };
+
+        var patient = BuildPatient(3400, patientPerson, doctor, room, nurse);
+
+        var bill = new EntityBill
+        {
+            BillId = 7200,
+            BillIdNumber = "BILL-7200",
+            AssignedPatientId = patient.PatientId,
+            AssignedPatient = patient,
+            Amount = 950.5m,
+            Description = "Room: 500; Doctor: 250; Medicine: 125.5; Other: 75; Additional checkup",
+            DateBilled = new DateTime(2025, 11, 4),
+            Status = 1
+        };
+
+        var mapped = HospitalDataService.MapBill(bill);
+
+        Assert.Equal(500m, mapped.RoomCharge);
+        Assert.Equal(250m, mapped.DoctorFee);
+        Assert.Equal(125.5m, mapped.MedicineCost);
+        Assert.Equal(75m, mapped.OtherCharge);
+        Assert.Equal("Additional checkup", mapped.Notes);
+        Assert.True(mapped.IsPaid);
     }
 
     private static EntityPerson BuildPerson(int id, string givenName, string lastName, string sex, long contactNumber)
@@ -184,7 +297,7 @@ public class MappingTests
             Suffix = null,
             Birthdate = DateOnly.FromDateTime(new DateTime(1980, 1, 1)),
             Sex = sex,
-            ContactNumber = contactNumber,
+            ContactNumber = contactNumber.ToString(),
             Address = $"{lastName} Residence",
             EmergencyContact = "Primary Contact",
             RelationshipToEmergencyContact = "Sibling",

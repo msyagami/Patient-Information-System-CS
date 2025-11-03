@@ -16,24 +16,61 @@ try
 
     var baselineAccounts = service.GetAllAccounts().Count();
     var baselineAppointments = service.GetAllAppointments().Count();
+    var baselineInvoices = service.GetOutstandingInvoices().Count();
     Console.WriteLine($"Baseline accounts: {baselineAccounts}");
     Console.WriteLine($"Baseline appointments: {baselineAppointments}");
+    Console.WriteLine($"Baseline outstanding invoices: {baselineInvoices}");
 
     using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
     EnsureSeedData();
 
     var timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+    var doctorAccount = service.CreateDoctorAccount(
+        fullName: $"Smoke Test Doctor {timestamp}",
+        email: string.Empty,
+        contactNumber: "+63 912 000 0001",
+        department: "General Medicine",
+        licenseNumber: string.Empty,
+        address: "Smoke Test Clinic",
+        status: DoctorStatus.Available,
+        birthDate: DateTime.Today.AddYears(-35),
+        sex: "M",
+        emergencyContact: "Smoke Contact",
+        emergencyRelationship: "Colleague",
+        nationality: "Smoke");
+
+    Console.WriteLine($"Created doctor account #{doctorAccount.UserId} ({doctorAccount.DisplayName})");
+
+    var nurseAccount = service.CreateNurseAccount(
+        fullName: $"Smoke Test Nurse {timestamp}",
+        email: string.Empty,
+        contactNumber: "+63 912 000 0002",
+        department: "General Medicine",
+        specialization: "General",
+        licenseNumber: string.Empty,
+        address: "Smoke Test Residence",
+        status: NurseStatus.Available,
+        birthDate: DateTime.Today.AddYears(-30),
+        sex: "F",
+        emergencyContact: "Smoke Contact",
+        emergencyRelationship: "Colleague",
+        nationality: "Smoke");
+
+    Console.WriteLine($"Created nurse account #{nurseAccount.UserId} ({nurseAccount.DisplayName})");
+
     var patientName = $"Smoke Test Patient {timestamp}";
     var patientAccount = service.CreatePatientAccount(
         fullName: patientName,
         email: string.Empty,
-        contactNumber: "+63 912 000 0000",
+        contactNumber: "+63 912 000 0003",
         address: "Smoke Test Ward",
         dateOfBirth: DateTime.Today.AddYears(-30),
         approve: true,
         currentlyAdmitted: true,
-        assignedDoctorUserId: null,
+        assignedDoctorUserId: doctorAccount.UserId,
+        assignedNurseUserId: nurseAccount.UserId,
         insuranceProvider: "SmokeHealth",
         emergencyContact: "Smoke Contact",
         roomAssignment: "Room 101",
@@ -49,29 +86,75 @@ try
     Console.WriteLine($"Admission listing includes patient: {admissionFound}");
 
     var appointment = service.ScheduleAppointment(
-        patientId: null,
-        doctorId: null,
+        patientId: patientAccount.UserId,
+        doctorId: doctorAccount.UserId,
         scheduledFor: DateTime.Now.AddHours(4),
         description: "Smoke test appointment");
 
     Console.WriteLine($"Scheduled appointment #{appointment.AppointmentId} for doctor {appointment.DoctorId} / patient {appointment.PatientId}");
 
     service.AcceptAppointment(appointment);
-    Console.WriteLine("Accepted appointment");
-
     service.CompleteAppointment(appointment);
-    Console.WriteLine("Completed appointment");
+    var managedAppointments = service.GetManagedAppointments().ToList();
+    var appointmentCompleted = managedAppointments.Any(a => a.AppointmentId == appointment.AppointmentId && a.Status == AppointmentStatus.Completed);
+    Console.WriteLine($"Appointment completed and tracked: {appointmentCompleted}");
+
+    var dischargeRequest = new DischargeBillingRequest
+    {
+        PatientUserId = patientAccount.UserId,
+        RoomCharge = 750m,
+        DoctorFee = 250m,
+        MedicineCost = 125.50m,
+        OtherCharges = 50m,
+        MarkAsPaid = false,
+        Notes = "Smoke discharge invoice",
+        DischargeDate = DateTime.Now
+    };
+
+    var dischargeInvoice = service.DischargePatient(patientAccount, dischargeRequest);
+    Console.WriteLine($"Discharged patient with invoice #{dischargeInvoice.InvoiceId} totaling {dischargeInvoice.TotalAmount:C}");
 
     var outstandingInvoices = service.GetOutstandingInvoices().ToList();
-    var invoiceForPatient = outstandingInvoices.FirstOrDefault(i => i.PatientId == appointment.PatientId);
+    var invoiceForPatient = outstandingInvoices.FirstOrDefault(i => i.InvoiceId == dischargeInvoice.InvoiceId);
     Console.WriteLine(invoiceForPatient is null
-        ? "No outstanding invoices for smoke appointment (expected if approved)."
-        : $"Found outstanding invoice #{invoiceForPatient.InvoiceId} for smoke appointment patient.");
+        ? "Expected outstanding invoice for discharge was not found."
+        : $"Outstanding invoice located for patient #{invoiceForPatient.PatientId}");
+
+    var refreshedPatient = service.GetAccountById(patientAccount.UserId) ?? throw new InvalidOperationException("Unable to refresh patient account after discharge.");
+    Console.WriteLine($"Patient has unpaid bills after discharge: {refreshedPatient.PatientProfile?.HasUnpaidBills}");
+
+    service.ReactivatePatient(refreshedPatient);
+    var reactivatedPatient = service.GetAccountById(patientAccount.UserId) ?? throw new InvalidOperationException("Unable to refresh patient account after reactivation.");
+    Console.WriteLine($"Patient reactivated. Outstanding flag cleared: {!reactivatedPatient.PatientProfile?.HasUnpaidBills}");
+
+    var readmittedPatient = service.ReadmitExistingPatient(new ExistingPatientAdmissionRequest
+    {
+        UserId = patientAccount.UserId,
+        AssignedDoctorUserId = doctorAccount.UserId,
+        AssignedNurseUserId = nurseAccount.UserId,
+        RoomAssignment = "Room 102",
+        AdmitDateOverride = DateTime.Now.AddMinutes(5),
+        ContactNumber = "+63 912 000 0004",
+        Address = "Smoke Test Ward B",
+        EmergencyContact = "Smoke Contact B",
+        EmergencyRelationship = "Friend",
+        InsuranceProvider = "SmokeHealth"
+    });
+
+    Console.WriteLine($"Readmitted patient room assignment: {readmittedPatient.PatientProfile?.RoomAssignment}");
+
+    var patientOptions = service.GetExistingPatientOptions();
+    var optionFound = patientOptions.Any(option => option.UserId == patientAccount.UserId);
+    Console.WriteLine($"Existing patient option available: {optionFound}");
+
+    var outstandingAfterReactivate = service.GetOutstandingInvoices().ToList();
+    var invoiceCleared = outstandingAfterReactivate.All(i => i.InvoiceId != dischargeInvoice.InvoiceId);
+    Console.WriteLine($"Outstanding invoice cleared after reactivation: {invoiceCleared}");
 
     var updatedAccounts = service.GetAllAccounts().Count();
     var updatedAppointments = service.GetAllAppointments().Count();
-    Console.WriteLine($"Accounts observed post-admission: {updatedAccounts}");
-    Console.WriteLine($"Appointments observed post-scheduling: {updatedAppointments}");
+    Console.WriteLine($"Accounts observed post-operations: {updatedAccounts}");
+    Console.WriteLine($"Appointments observed post-operations: {updatedAppointments}");
 
     // Dispose without scope.Complete() to roll back changes
 }
@@ -120,7 +203,7 @@ static void EnsureSeedData()
                 MiddleName = "Test",
                 Birthdate = DateOnly.FromDateTime(DateTime.Today.AddYears(-40)),
                 Sex = "U",
-                ContactNumber = 639120000001,
+                ContactNumber = "639120000001",
                 Address = "Smoke Doctor Residence",
                 EmergencyContact = "Smoke Contact",
                 RelationshipToEmergencyContact = "Colleague",
@@ -161,7 +244,7 @@ static void EnsureSeedData()
                 MiddleName = "Test",
                 Birthdate = DateOnly.FromDateTime(DateTime.Today.AddYears(-35)),
                 Sex = "U",
-                ContactNumber = 639120000002,
+                ContactNumber = "639120000002",
                 Address = "Smoke Nurse Residence",
                 EmergencyContact = "Smoke Contact",
                 RelationshipToEmergencyContact = "Colleague",

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Microsoft.Win32;
 using Patient_Information_System_CS.Models;
 using Patient_Information_System_CS.Services;
 
@@ -11,6 +12,7 @@ namespace Patient_Information_System_CS.Views.Staff
     public partial class ReceptionistBillingInvoiceView : UserControl
     {
         private readonly HospitalDataService _dataService = HospitalDataService.Instance;
+        private readonly PdfExportService _pdfExport = PdfExportService.Instance;
         private readonly UserAccount? _staffAccount;
         private BillingRecord? _selectedInvoice;
 
@@ -119,7 +121,27 @@ namespace Patient_Information_System_CS.Views.Staff
                 return;
             }
 
-            MessageBox.Show("Exporting invoices will be added in a future update.", "Export not available", MessageBoxButton.OK, MessageBoxImage.Information);
+            var dialog = new SaveFileDialog
+            {
+                Title = "Save Invoice as PDF",
+                FileName = $"Invoice_{_selectedInvoice.InvoiceId}.pdf",
+                Filter = "PDF files (*.pdf)|*.pdf"
+            };
+
+            if (dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            try
+            {
+                _pdfExport.ExportInvoice(_selectedInvoice, dialog.FileName);
+                MessageBox.Show("Invoice exported successfully.", "Export complete", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Unable to export invoice. {ex.Message}", "Export failed", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void DisplayInvoiceDetails(BillingRecord? invoice)

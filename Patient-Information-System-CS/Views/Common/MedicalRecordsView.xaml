@@ -169,7 +169,7 @@
                                Margin="0,0,0,16"/>
 
                         <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Left">
+                                    HorizontalAlignment="Left">
                         <Button x:Name="RefreshButton"
                                 Content="Refresh"
                                 Padding="18,8"
@@ -178,7 +178,18 @@
                                 Background="White"
                                 Foreground="#37474F"
                                 Cursor="Hand"
-                                Click="RefreshButton_Click"/>
+                                    Margin="0,0,12,0"
+                                    Click="RefreshButton_Click"/>
+                            <Button x:Name="ExportRecordButton"
+                                    Content="Export PDF"
+                                    Padding="18,8"
+                                    BorderBrush="#1976D2"
+                                    BorderThickness="1"
+                                    Background="White"
+                                    Foreground="#1976D2"
+                                    Cursor="Hand"
+                                    Visibility="Collapsed"
+                                    Click="ExportRecordButton_Click"/>
                     </StackPanel>
                 </StackPanel>
             </ScrollViewer>

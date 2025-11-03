@@ -401,7 +401,10 @@ public partial class HospitalDbContext : DbContext
             entity.Property(e => e.Address)
                 .HasMaxLength(500)
                 .IsUnicode(false);
-            entity.Property(e => e.ContactNumber).HasColumnName("Contact_Number");
+            entity.Property(e => e.ContactNumber)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .HasColumnName("Contact_Number");
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
                 .IsUnicode(false);

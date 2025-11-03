@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Win32;
 using Patient_Information_System_CS.Models;
 using Patient_Information_System_CS.Services;
 
@@ -18,6 +20,7 @@ public partial class MedicalRecordsView : UserControl
     private int? _patientScope;
     private int? _doctorScope;
     private int? _currentUserId;
+    private readonly PdfExportService _pdfExport = PdfExportService.Instance;
 
     public MedicalRecordsView()
     {
@@ -177,6 +180,7 @@ public partial class MedicalRecordsView : UserControl
             DiagnosisTextBlock.Text = "-";
             TreatmentTextBlock.Text = "-";
             PrescriptionsTextBlock.Text = "-";
+            UpdateExportButtonVisibility(Visibility.Collapsed);
             return;
         }
 
@@ -187,6 +191,15 @@ public partial class MedicalRecordsView : UserControl
         DiagnosisTextBlock.Text = record.Diagnosis;
         TreatmentTextBlock.Text = record.Treatment;
         PrescriptionsTextBlock.Text = record.Prescriptions ?? "-";
+        UpdateExportButtonVisibility(Visibility.Visible);
+    }
+
+    private void UpdateExportButtonVisibility(Visibility visibility)
+    {
+        if (FindName("ExportRecordButton") is Button button)
+        {
+            button.Visibility = visibility;
+        }
     }
 
     private void PatientFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -254,6 +267,51 @@ public partial class MedicalRecordsView : UserControl
                     MessageBoxImage.Error);
             }
         }
+    }
+
+    private void ExportRecordButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_selectedRecord is null)
+        {
+            return;
+        }
+
+        var dialog = new SaveFileDialog
+        {
+            Title = "Save Medical Record as PDF",
+            FileName = BuildRecordFileName(_selectedRecord) + ".pdf",
+            Filter = "PDF files (*.pdf)|*.pdf"
+        };
+
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        try
+        {
+            _pdfExport.ExportMedicalRecord(_selectedRecord, dialog.FileName);
+            MessageBox.Show("Medical record exported successfully.", "Export complete", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Unable to export the medical record. {ex.Message}", "Export failed", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private static string BuildRecordFileName(MedicalRecordEntry record)
+    {
+        var baseName = string.IsNullOrWhiteSpace(record.RecordNumber)
+            ? $"MedicalRecord_{record.RecordId}"
+            : record.RecordNumber;
+
+        foreach (var invalidChar in Path.GetInvalidFileNameChars())
+        {
+            baseName = baseName.Replace(invalidChar, '_');
+        }
+
+        baseName = baseName.Trim('_');
+        return string.IsNullOrWhiteSpace(baseName) ? $"MedicalRecord_{record.RecordId}" : baseName;
     }
 
     private void OnMedicalRecordsChanged(object? sender, EventArgs e)

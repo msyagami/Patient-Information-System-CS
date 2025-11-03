@@ -65,12 +65,12 @@
         </StackPanel>
 
         <Border Grid.Row="1"
-                MaxWidth="380"
+            MaxWidth="420"
                 Background="White"
                 BorderBrush="#D9E2EC"
                 BorderThickness="1"
                 CornerRadius="8"
-                Padding="32"
+            Padding="28"
                 VerticalAlignment="Top">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="14" ShadowDepth="2" Opacity="0.25"/>
@@ -79,39 +79,40 @@
                 <TextBlock Text="Select Portal"
                            FontWeight="Bold"
                            Foreground="#2C3E50"/>
-                <WrapPanel Margin="0,12,0,24"
-                       HorizontalAlignment="Center">
+                <StackPanel Margin="0,12,0,24"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center">
                     <RadioButton Content="Admin"
                                  GroupName="Portal"
                                  Style="{StaticResource PortalRadioStyle}"
                                  Tag="Admin"
                          IsChecked="True"
-                         Margin="0,0,10,0"
+                         Margin="0,0,8,0"
                                  Checked="RoleRadioButton_Checked"/>
                     <RadioButton Content="Doctor"
                                  GroupName="Portal"
                                  Style="{StaticResource PortalRadioStyle}"
-                                 Tag="Doctor"
-                         Margin="0,0,10,0"
+                         Tag="Doctor"
+                         Margin="0,0,8,0"
                                  Checked="RoleRadioButton_Checked"/>
                     <RadioButton Content="Nurse"
                          GroupName="Portal"
                          Style="{StaticResource PortalRadioStyle}"
                          Tag="Nurse"
-                     Margin="0,0,10,0"
+                         Margin="0,0,8,0"
                          Checked="RoleRadioButton_Checked"/>
                     <RadioButton Content="Patient"
                                  GroupName="Portal"
                                  Style="{StaticResource PortalRadioStyle}"
-                                 Tag="Patient"
-                         Margin="0,0,10,0"
+                         Tag="Patient"
+                         Margin="0,0,8,0"
                                  Checked="RoleRadioButton_Checked"/>
                     <RadioButton Content="Staff"
                                  GroupName="Portal"
                                  Style="{StaticResource PortalRadioStyle}"
                                  Tag="Staff"
                                  Checked="RoleRadioButton_Checked"/>
-                </WrapPanel>
+                </StackPanel>
 
                 <StackPanel>
                     <TextBlock Text="Username"
@@ -148,25 +149,6 @@
                             BorderThickness="0"
                             Cursor="Hand"
                             Click="LoginButton_Click"/>
-
-                    <Border Background="#E3F2FD"
-                            BorderBrush="#90CAF9"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            Padding="12"
-                            Margin="0,20,0,0">
-                        <StackPanel>
-                            <TextBlock Text="Demo Credentials"
-                                       FontWeight="Bold"
-                                       Foreground="#0D47A1"/>
-                            <TextBlock Text="Admin: admin1 / adminpass"
-                                       Margin="0,6,0,0"/>
-                            <TextBlock Text="Doctor: doc1 / doctorpass"/>
-                            <TextBlock Text="Nurse: nurse1 / nurse123"/>
-                            <TextBlock Text="Patient: patient1 / patientpass"/>
-                            <TextBlock Text="Staff: staff1 / staffpass"/>
-                        </StackPanel>
-                    </Border>
                 </StackPanel>
             </StackPanel>
         </Border>
