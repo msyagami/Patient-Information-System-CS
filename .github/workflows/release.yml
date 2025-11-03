@@ -68,4 +68,4 @@ jobs:
           artifacts: build/PatientInformationSystem-${{ steps.tag.outputs.tag }}.zip
           body: |
             Automated release build for ${{ steps.tag.outputs.tag }}.
-          allowUpdates: true
+          allowUpdates: true 
