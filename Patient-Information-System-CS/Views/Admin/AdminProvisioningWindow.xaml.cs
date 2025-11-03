@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Controls;
 using Patient_Information_System_CS.Models;
 using Patient_Information_System_CS.Services;
 
@@ -25,6 +26,7 @@ namespace Patient_Information_System_CS.Views.Admin
             AddressTextBox.Text = string.IsNullOrWhiteSpace(AddressTextBox.Text)
                 ? "Hospital Campus"
                 : AddressTextBox.Text;
+            SexComboBox.SelectedValue ??= "U";
         }
 
         private void CreateAdministrator_Click(object sender, RoutedEventArgs e)
@@ -72,7 +74,7 @@ namespace Patient_Information_System_CS.Views.Admin
                 Address = AddressTextBox.Text?.Trim() ?? "Hospital Campus",
                 EmergencyContact = "Primary Contact",
                 RelationshipToEmergencyContact = "Self",
-                Sex = "Unspecified",
+                Sex = GetSelectedSex(),
                 Nationality = "PH",
                 BirthDate = BirthDatePicker.SelectedDate.Value.Date
             };
@@ -110,6 +112,11 @@ namespace Patient_Information_System_CS.Views.Admin
             FeedbackTextBlock.Visibility = string.IsNullOrWhiteSpace(message)
                 ? Visibility.Collapsed
                 : Visibility.Visible;
+        }
+
+        private string GetSelectedSex()
+        {
+            return SexComboBox.SelectedValue as string ?? "U";
         }
     }
 }

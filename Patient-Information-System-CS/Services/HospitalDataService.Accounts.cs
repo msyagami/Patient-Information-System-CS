@@ -438,14 +438,17 @@ namespace Patient_Information_System_CS.Services
         public IEnumerable<UserAccount> GetSchedulablePatients() => GetApprovedPatients();
 
         public UserAccount AdmitNewPatient(string fullName,
-                                           DateTime dateOfBirth,
-                                           string contactNumber,
-                                           string address,
-                                           string emergencyContact,
-                                           string insuranceProvider,
-                                           UserAccount? doctor,
-                                           string roomAssignment,
-                                           DateTime? admitDateOverride = null)
+                           DateTime dateOfBirth,
+                           string contactNumber,
+                           string address,
+                           string emergencyContact,
+                           string insuranceProvider,
+                           UserAccount? doctor,
+                           string roomAssignment,
+                           DateTime? admitDateOverride = null,
+                           string sex = DefaultSexCode,
+                           string emergencyRelationship = "Unknown",
+                           string nationality = "Unknown")
         {
             var email = GenerateEmailAddress(fullName);
             var doctorId = doctor?.UserId;
@@ -461,7 +464,10 @@ namespace Patient_Information_System_CS.Services
                                         insuranceProvider,
                                         emergencyContact,
                                         roomAssignment,
-                                        admitDateOverride);
+                                        sex,
+                                        emergencyRelationship,
+                                        nationality,
+                                        admitDateOverride: admitDateOverride);
         }
 
         public UserAccount? GetDoctorById(int? doctorUserId)
@@ -477,7 +483,13 @@ namespace Patient_Information_System_CS.Services
         public UserAccount CreateStaffAccount(string fullName,
                                               string email,
                                               string contactNumber,
-                                              bool approve)
+                                              bool approve,
+                                              DateTime birthDate,
+                                              string sex,
+                                              string address,
+                                              string emergencyContact,
+                                              string emergencyRelationship,
+                                              string nationality)
         {
             if (string.IsNullOrWhiteSpace(fullName))
             {
@@ -491,9 +503,10 @@ namespace Patient_Information_System_CS.Services
             var userId = NextUserId(context);
 
             var username = GenerateUniqueUsername(context, fullName, "staff");
-            var emailAddress = string.IsNullOrWhiteSpace(email) ? GenerateEmailAddress(fullName) : email;
+            var emailAddress = string.IsNullOrWhiteSpace(email) ? GenerateEmailAddress(fullName) : email.Trim();
             var contactValue = ParseContactNumber(contactNumber);
             var nameParts = ParseName(fullName);
+            var normalizedSex = NormalizeSexCode(sex);
 
             var person = new EntityPerson
             {
@@ -501,14 +514,14 @@ namespace Patient_Information_System_CS.Services
                 GivenName = nameParts.GivenName,
                 LastName = nameParts.LastName,
                 MiddleName = nameParts.MiddleName,
-                Birthdate = DateOnly.FromDateTime(DateTime.Today.AddYears(-30)),
-                Sex = DefaultSexCode,
+                Birthdate = DateOnly.FromDateTime(birthDate.Date),
+                Sex = normalizedSex,
                 ContactNumber = contactValue,
-                Address = "Not Provided",
-                EmergencyContact = "Not Provided",
-                RelationshipToEmergencyContact = "Unknown",
+                Address = string.IsNullOrWhiteSpace(address) ? "Not Provided" : address.Trim(),
+                EmergencyContact = string.IsNullOrWhiteSpace(emergencyContact) ? "Not Provided" : emergencyContact.Trim(),
+                RelationshipToEmergencyContact = string.IsNullOrWhiteSpace(emergencyRelationship) ? "Unknown" : emergencyRelationship.Trim(),
                 Email = emailAddress,
-                Nationality = "Unknown"
+                Nationality = string.IsNullOrWhiteSpace(nationality) ? "Unknown" : nationality.Trim()
             };
 
             var staff = new EntityStaff
@@ -550,7 +563,12 @@ namespace Patient_Information_System_CS.Services
                                                string department,
                                                string licenseNumber,
                                                string address,
-                                               DoctorStatus status)
+                                               DoctorStatus status,
+                                               DateTime birthDate,
+                                               string sex,
+                                               string emergencyContact,
+                                               string emergencyRelationship,
+                                               string nationality)
         {
             if (string.IsNullOrWhiteSpace(fullName))
             {
@@ -564,9 +582,10 @@ namespace Patient_Information_System_CS.Services
             var userId = NextUserId(context);
 
             var username = GenerateUniqueUsername(context, fullName, "doctor");
-            var emailAddress = string.IsNullOrWhiteSpace(email) ? GenerateEmailAddress(fullName) : email;
+            var emailAddress = string.IsNullOrWhiteSpace(email) ? GenerateEmailAddress(fullName) : email.Trim();
             var contactValue = ParseContactNumber(contactNumber);
             var nameParts = ParseName(fullName);
+            var normalizedSex = NormalizeSexCode(sex);
 
             var person = new EntityPerson
             {
@@ -574,14 +593,14 @@ namespace Patient_Information_System_CS.Services
                 GivenName = nameParts.GivenName,
                 LastName = nameParts.LastName,
                 MiddleName = nameParts.MiddleName,
-                Birthdate = DateOnly.FromDateTime(DateTime.Today.AddYears(-35)),
-                Sex = DefaultSexCode,
+                Birthdate = DateOnly.FromDateTime(birthDate.Date),
+                Sex = normalizedSex,
                 ContactNumber = contactValue,
-                Address = string.IsNullOrWhiteSpace(address) ? "Not Provided" : address,
-                EmergencyContact = "Not Provided",
-                RelationshipToEmergencyContact = "Unknown",
+                Address = string.IsNullOrWhiteSpace(address) ? "Not Provided" : address.Trim(),
+                EmergencyContact = string.IsNullOrWhiteSpace(emergencyContact) ? "Not Provided" : emergencyContact.Trim(),
+                RelationshipToEmergencyContact = string.IsNullOrWhiteSpace(emergencyRelationship) ? "Unknown" : emergencyRelationship.Trim(),
                 Email = emailAddress,
-                Nationality = "Unknown"
+                Nationality = string.IsNullOrWhiteSpace(nationality) ? "Unknown" : nationality.Trim()
             };
 
             var doctorEntity = new EntityDoctor
@@ -622,17 +641,20 @@ namespace Patient_Information_System_CS.Services
         }
 
         public UserAccount CreatePatientAccount(string fullName,
-                                                string email,
-                                                string contactNumber,
-                                                string address,
-                                                DateTime dateOfBirth,
-                                                bool approve,
-                                                bool currentlyAdmitted,
-                                                int? assignedDoctorUserId,
-                                                string insuranceProvider,
-                                                string emergencyContact,
-                                                string roomAssignment,
-                                                DateTime? admitDateOverride = null)
+                            string email,
+                            string contactNumber,
+                            string address,
+                            DateTime dateOfBirth,
+                            bool approve,
+                            bool currentlyAdmitted,
+                            int? assignedDoctorUserId,
+                            string insuranceProvider,
+                            string emergencyContact,
+                            string roomAssignment,
+                            string sex = DefaultSexCode,
+                            string emergencyRelationship = "Unknown",
+                            string nationality = "Unknown",
+                            DateTime? admitDateOverride = null)
         {
             if (string.IsNullOrWhiteSpace(fullName))
             {
@@ -661,6 +683,12 @@ namespace Patient_Information_System_CS.Services
             var contactValue = ParseContactNumber(contactNumber);
             var nameParts = ParseName(fullName);
 
+            var normalizedSex = NormalizeSexCode(sex);
+            var trimmedAddress = string.IsNullOrWhiteSpace(address) ? "Not Provided" : address.Trim();
+            var trimmedEmergencyContact = string.IsNullOrWhiteSpace(emergencyContact) ? "Not Provided" : emergencyContact.Trim();
+            var trimmedRelationship = string.IsNullOrWhiteSpace(emergencyRelationship) ? "Unknown" : emergencyRelationship.Trim();
+            var trimmedNationality = string.IsNullOrWhiteSpace(nationality) ? "Unknown" : nationality.Trim();
+
             var person = new EntityPerson
             {
                 PersonId = personId,
@@ -668,13 +696,13 @@ namespace Patient_Information_System_CS.Services
                 LastName = nameParts.LastName,
                 MiddleName = nameParts.MiddleName,
                 Birthdate = DateOnly.FromDateTime(dateOfBirth.Date),
-                Sex = DefaultSexCode,
+                Sex = normalizedSex,
                 ContactNumber = contactValue,
-                Address = string.IsNullOrWhiteSpace(address) ? "Not Provided" : address,
-                EmergencyContact = string.IsNullOrWhiteSpace(emergencyContact) ? "Not Provided" : emergencyContact,
-                RelationshipToEmergencyContact = "Unknown",
+                Address = trimmedAddress,
+                EmergencyContact = trimmedEmergencyContact,
+                RelationshipToEmergencyContact = trimmedRelationship,
                 Email = emailAddress,
-                Nationality = "Unknown"
+                Nationality = trimmedNationality
             };
 
             var patientEntity = new EntityPatient

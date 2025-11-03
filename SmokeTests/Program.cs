@@ -37,6 +37,9 @@ try
         insuranceProvider: "SmokeHealth",
         emergencyContact: "Smoke Contact",
         roomAssignment: "Room 101",
+        sex: "U",
+        emergencyRelationship: "Colleague",
+        nationality: "Smoke",
         admitDateOverride: DateTime.Today.AddHours(-1));
 
     Console.WriteLine($"Created patient account #{patientAccount.UserId} ({patientAccount.DisplayName})");

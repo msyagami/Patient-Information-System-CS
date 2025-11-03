@@ -85,7 +85,13 @@ namespace Patient_Information_System_CS.Views.Admin
             var account = _dataService.CreateStaffAccount(dialog.FullName,
                                                            dialog.Email,
                                                            dialog.ContactNumber,
-                                                           dialog.ShouldApprove);
+                                                           dialog.ShouldApprove,
+                                                           dialog.BirthDate,
+                                                           dialog.Sex,
+                                                           dialog.Address,
+                                                           dialog.EmergencyContact,
+                                                           dialog.EmergencyRelationship,
+                                                           dialog.Nationality);
 
             RefreshTables();
             MessageBox.Show($"Staff account for {account.DisplayName} created.",

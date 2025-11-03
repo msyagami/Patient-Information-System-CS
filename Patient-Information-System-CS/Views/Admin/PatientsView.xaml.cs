@@ -73,7 +73,11 @@ namespace Patient_Information_System_CS.Views.Admin
         private void AddPatientButton_Click(object sender, RoutedEventArgs e)
         {
             var doctors = _dataService.GetActiveDoctors().Concat(_dataService.GetUnavailableDoctors()).ToList();
-            var dialog = new AddPatientWindow(doctors)
+            var availableRooms = _dataService.GetRoomStatuses()
+                                             .Where(room => room.AvailableSlots > 0)
+                                             .ToList();
+
+            var dialog = new AddPatientWindow(doctors, availableRooms)
             {
                 Owner = Window.GetWindow(this)
             };
@@ -93,7 +97,10 @@ namespace Patient_Information_System_CS.Views.Admin
                                                             dialog.SelectedDoctorId,
                                                             dialog.InsuranceProvider,
                                                             dialog.EmergencyContact,
-                                                            dialog.RoomAssignment);
+                                                            dialog.RoomAssignment,
+                                                            dialog.Sex,
+                                                            dialog.EmergencyRelationship,
+                                                            dialog.Nationality);
 
             RefreshTables();
             MessageBox.Show($"Patient record for {account.DisplayName} created.",

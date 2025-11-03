@@ -99,7 +99,12 @@ namespace Patient_Information_System_CS.Views.Admin
                                                            dialog.Department,
                                                            dialog.LicenseNumber,
                                                            dialog.Address,
-                                                           dialog.SelectedStatus);
+                                                           dialog.SelectedStatus,
+                                                           dialog.BirthDate,
+                                                           dialog.Sex,
+                                                           dialog.EmergencyContact,
+                                                           dialog.EmergencyRelationship,
+                                                           dialog.Nationality);
 
             RefreshTables();
             MessageBox.Show($"Doctor account for {account.DisplayName} created.",

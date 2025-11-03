@@ -107,6 +107,11 @@
                                        GroupName="Navigation"
                                        Tag="Patients"
                                        Click="NavButton_Click"/>
+                            <RadioButton Content="Rooms" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Rooms"
+                                       Click="NavButton_Click"/>
                             <RadioButton Content="Appointments" 
                                        Style="{StaticResource NavButtonStyle}"
                                        GroupName="Navigation"
@@ -186,6 +191,11 @@
                                        Style="{StaticResource NavButtonStyle}"
                                        GroupName="Navigation"
                                        Tag="Patients"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Rooms" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Rooms"
                                        Click="NavButton_Click"/>
                             <RadioButton Content="Appointments" 
                                        Style="{StaticResource NavButtonStyle}"

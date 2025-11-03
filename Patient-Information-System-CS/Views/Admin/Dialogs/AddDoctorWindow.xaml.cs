@@ -10,6 +10,7 @@ namespace Patient_Information_System_CS.Views.Admin.Dialogs
         public AddDoctorWindow()
         {
             InitializeComponent();
+            Loaded += OnLoaded;
             StatusComboBox.ItemsSource = Enum.GetValues(typeof(DoctorStatus)).Cast<DoctorStatus>();
             StatusComboBox.SelectedItem = DoctorStatus.OnHold;
         }
@@ -20,7 +21,22 @@ namespace Patient_Information_System_CS.Views.Admin.Dialogs
         public string LicenseNumber => LicenseTextBox.Text.Trim();
         public string ContactNumber => ContactTextBox.Text.Trim();
         public string Address => AddressTextBox.Text.Trim();
+        public DateTime BirthDate => BirthDatePicker.SelectedDate ?? DateTime.Today.AddYears(-30);
+        public string Sex => SexComboBox.SelectedValue as string ?? "U";
+        public string EmergencyContact => EmergencyContactTextBox.Text.Trim();
+        public string EmergencyRelationship => EmergencyRelationshipTextBox.Text.Trim();
+        public string Nationality => NationalityTextBox.Text.Trim();
         public DoctorStatus SelectedStatus => StatusComboBox.SelectedItem is DoctorStatus status ? status : DoctorStatus.OnHold;
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            BirthDatePicker.SelectedDate ??= DateTime.Today.AddYears(-30);
+            SexComboBox.SelectedValue ??= "U";
+            if (string.IsNullOrWhiteSpace(NationalityTextBox.Text))
+            {
+                NationalityTextBox.Text = "PH";
+            }
+        }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -45,6 +61,18 @@ namespace Patient_Information_System_CS.Views.Admin.Dialogs
             if (string.IsNullOrWhiteSpace(LicenseNumber))
             {
                 ShowError("License number is required.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(Address))
+            {
+                ShowError("Address is required.");
+                return;
+            }
+
+            if (BirthDatePicker.SelectedDate is null)
+            {
+                ShowError("Please select a birth date.");
                 return;
             }
 

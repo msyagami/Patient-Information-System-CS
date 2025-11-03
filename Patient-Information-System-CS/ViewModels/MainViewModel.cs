@@ -79,6 +79,7 @@ namespace Patient_Information_System_CS.ViewModels
                 "Staffs" when IsAdminRole => new Views.Admin.StaffsView(),
                 "Doctors" when IsAdminRole => new Views.Admin.DoctorsView(),
                 "Patients" when IsAdminRole => new Views.Admin.PatientsView(),
+                "Rooms" when IsAdminRole => new Views.Admin.RoomsView(),
                 "Appointments" when IsAdminRole => new Views.Admin.AppointmentsView(),
                 "Billing/Invoice" when IsAdminRole => new Views.Admin.BillingView(),
 
@@ -98,6 +99,7 @@ namespace Patient_Information_System_CS.ViewModels
                 "Admission" when IsStaffRole => new Views.Staff.ReceptionistAdmissionView(CurrentUser),
                 "Doctors" when IsStaffRole => new Views.Staff.ReceptionistDoctorsView(),
                 "Patients" when IsStaffRole => new Views.Staff.ReceptionistPatientsView(CurrentUser),
+                "Rooms" when IsStaffRole => new Views.Admin.RoomsView(),
                 "Appointments" when IsStaffRole => new Views.Staff.ReceptionistAppointmentsView(CurrentUser),
                 "Billing/Invoice" when IsStaffRole => new Views.Staff.ReceptionistBillingInvoiceView(CurrentUser),
 

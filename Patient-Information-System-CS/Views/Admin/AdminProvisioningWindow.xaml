@@ -80,6 +80,16 @@
                         <TextBlock Text="Birth Date" FontWeight="SemiBold"/>
                         <DatePicker x:Name="BirthDatePicker" Height="34" Padding="4" SelectedDate="{x:Static System:DateTime.Today}"/>
                     </StackPanel>
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="Sex" FontWeight="SemiBold"/>
+                        <ComboBox x:Name="SexComboBox"
+                                  Height="34"
+                                  SelectedValuePath="Tag">
+                            <ComboBoxItem Content="Female" Tag="F"/>
+                            <ComboBoxItem Content="Male" Tag="M"/>
+                            <ComboBoxItem Content="Unspecified" Tag="U"/>
+                        </ComboBox>
+                    </StackPanel>
                     <StackPanel>
                         <TextBlock Text="Address" FontWeight="SemiBold"/>
                         <TextBox x:Name="AddressTextBox" Height="34" Padding="8"/>

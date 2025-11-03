@@ -172,9 +172,7 @@ namespace Patient_Information_System_CS.Views.Staff
             var address = AddressTextBox.Text.Trim();
             var emergencyContactName = EmergencyContactTextBox.Text.Trim();
             var relationship = EmergencyRelationshipTextBox.Text.Trim();
-            var emergencyContact = relationship.Length > 0
-                ? string.Format(CultureInfo.CurrentCulture, "{0} ({1})", emergencyContactName, relationship)
-                : emergencyContactName;
+            var emergencyContact = emergencyContactName;
             var insurance = string.IsNullOrWhiteSpace(InsuranceTextBox.Text) ? "Not Provided" : InsuranceTextBox.Text.Trim();
             var doctor = DoctorComboBox.SelectedItem as UserAccount;
             var roomAssignment = GetRoomSelection();
@@ -207,7 +205,8 @@ namespace Patient_Information_System_CS.Views.Staff
                 insurance,
                 doctor,
                 roomAssignment,
-                admitDate);
+                admitDateOverride: admitDate,
+                emergencyRelationship: relationship);
 
             MessageBox.Show(
                 $"{newPatient.DisplayName} is now admitted.\n\nUsername: {newPatient.Username}\nTemporary Password: {newPatient.Password}",

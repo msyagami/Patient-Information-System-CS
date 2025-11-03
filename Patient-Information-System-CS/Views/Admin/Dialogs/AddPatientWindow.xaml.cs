@@ -9,14 +9,16 @@ namespace Patient_Information_System_CS.Views.Admin.Dialogs
     public partial class AddPatientWindow : Window
     {
         private readonly IReadOnlyList<UserAccount> _doctors;
+        private readonly IReadOnlyList<RoomStatus> _rooms;
 
-        public AddPatientWindow(IReadOnlyList<UserAccount> doctors)
+        public AddPatientWindow(IReadOnlyList<UserAccount> doctors,
+                                IReadOnlyList<RoomStatus> rooms)
         {
             InitializeComponent();
             _doctors = doctors;
-            DoctorComboBox.ItemsSource = _doctors;
-            BirthDatePicker.SelectedDate = DateTime.Today.AddYears(-30);
-            CurrentlyAdmittedCheckBox_OnChanged(this, new RoutedEventArgs());
+            _rooms = rooms;
+
+            Loaded += OnLoaded;
         }
 
         public string FullName => FullNameTextBox.Text.Trim();
@@ -27,9 +29,30 @@ namespace Patient_Information_System_CS.Views.Admin.Dialogs
         public int? SelectedDoctorId => DoctorComboBox.SelectedItem is UserAccount account ? account.UserId : null;
         public string InsuranceProvider => InsuranceTextBox.Text.Trim();
         public string EmergencyContact => EmergencyTextBox.Text.Trim();
+        public string EmergencyRelationship => EmergencyRelationshipTextBox.Text.Trim();
+        public string Nationality => NationalityTextBox.Text.Trim();
+        public string Sex => SexComboBox.SelectedValue as string ?? "U";
         public bool ShouldApprove => ApproveCheckBox.IsChecked == true;
         public bool IsCurrentlyAdmitted => CurrentlyAdmittedCheckBox.IsChecked == true;
-        public string RoomAssignment => RoomTextBox.Text.Trim();
+        public string RoomAssignment => RoomComboBox.SelectedItem is RoomStatus room
+            ? string.Format(System.Globalization.CultureInfo.InvariantCulture, "Room {0} - {1}", room.RoomNumber, room.RoomType)
+            : string.Empty;
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            DoctorComboBox.ItemsSource = _doctors;
+            RoomComboBox.ItemsSource = _rooms;
+
+            BirthDatePicker.SelectedDate ??= DateTime.Today.AddYears(-30);
+            SexComboBox.SelectedValue = "U";
+
+            if (string.IsNullOrWhiteSpace(NationalityTextBox.Text))
+            {
+                NationalityTextBox.Text = "PH";
+            }
+
+            CurrentlyAdmittedCheckBox_OnChanged(this, new RoutedEventArgs());
+        }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -45,9 +68,9 @@ namespace Patient_Information_System_CS.Views.Admin.Dialogs
                 return;
             }
 
-            if (IsCurrentlyAdmitted && string.IsNullOrWhiteSpace(RoomAssignment))
+            if (IsCurrentlyAdmitted && RoomComboBox.SelectedItem is not RoomStatus)
             {
-                ShowError("Room assignment is required for admitted patients.");
+                ShowError("Please select a room for admitted patients.");
                 return;
             }
 
@@ -62,7 +85,17 @@ namespace Patient_Information_System_CS.Views.Admin.Dialogs
 
         private void CurrentlyAdmittedCheckBox_OnChanged(object sender, RoutedEventArgs e)
         {
-            RoomTextBox.IsEnabled = CurrentlyAdmittedCheckBox.IsChecked == true;
+            var enable = CurrentlyAdmittedCheckBox.IsChecked == true;
+            RoomComboBox.IsEnabled = enable;
+
+            if (!enable)
+            {
+                RoomComboBox.SelectedIndex = -1;
+            }
+            else if (RoomComboBox.SelectedIndex < 0 && RoomComboBox.Items.Count > 0)
+            {
+                RoomComboBox.SelectedIndex = 0;
+            }
         }
 
         private void ShowError(string message)
