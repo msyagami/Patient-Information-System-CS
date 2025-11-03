@@ -17,11 +17,31 @@ namespace Patient_Information_System_CS.Services
         public IEnumerable<Appointment> GetManagedAppointments() =>
             LoadAppointments().Where(appointment => appointment.Status != AppointmentStatus.Pending);
 
-        public IEnumerable<Appointment> GetAppointmentsForDoctor(int doctorId) =>
-            LoadAppointments().Where(appointment => appointment.DoctorId == doctorId);
+        public IEnumerable<Appointment> GetAppointmentsForDoctor(int doctorId)
+        {
+            using var context = CreateContext();
+            var normalizedDoctorId = NormalizeDoctorId(context, doctorId);
 
-        public IEnumerable<Appointment> GetAppointmentsForPatient(int patientId) =>
-            LoadAppointments().Where(appointment => appointment.PatientId == patientId);
+            if (!normalizedDoctorId.HasValue)
+            {
+                return Array.Empty<Appointment>();
+            }
+
+            return LoadAppointments().Where(appointment => appointment.DoctorId == normalizedDoctorId.Value);
+        }
+
+        public IEnumerable<Appointment> GetAppointmentsForPatient(int patientId)
+        {
+            using var context = CreateContext();
+            var normalizedPatientId = NormalizePatientId(context, patientId);
+
+            if (!normalizedPatientId.HasValue)
+            {
+                return Array.Empty<Appointment>();
+            }
+
+            return LoadAppointments().Where(appointment => appointment.PatientId == normalizedPatientId.Value);
+        }
 
         public IEnumerable<Appointment> GetAllAppointments() => LoadAppointments();
 
@@ -31,12 +51,18 @@ namespace Patient_Information_System_CS.Services
 
             var appointmentId = NextAppointmentId(context);
 
+            var resolvedPatientId = NormalizePatientId(context, patientId);
+            var resolvedDoctorId = NormalizeDoctorId(context, doctorId);
+
+            var assignedPatientId = resolvedPatientId ?? ResolveFallbackPatient(context);
+            var assignedDoctorId = resolvedDoctorId ?? ResolveFallbackDoctor(context);
+
             var appointmentEntity = new EntityAppointment
             {
                 AppointmentId = appointmentId,
                 AppointmentIdNumber = $"APT-{appointmentId:D6}",
-                AssignedPatientId = patientId ?? ResolveFallbackPatient(context),
-                AssignedDoctorId = doctorId ?? ResolveFallbackDoctor(context),
+                AssignedPatientId = assignedPatientId,
+                AssignedDoctorId = assignedDoctorId,
                 AppointmentSchedule = scheduledFor,
                 AppointmentPurpose = string.IsNullOrWhiteSpace(description) ? "General consultation" : description,
                 AppointmentStatus = MapAppointmentStatusToByte(AppointmentStatus.Pending)

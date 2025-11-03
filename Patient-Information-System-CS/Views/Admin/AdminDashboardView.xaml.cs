@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using Patient_Information_System_CS.Models;
 using Patient_Information_System_CS.Services;
 
@@ -12,6 +14,9 @@ namespace Patient_Information_System_CS.Views.Admin
     public partial class AdminDashboardView : UserControl
     {
         private readonly HospitalDataService _dataService = HospitalDataService.Instance;
+        private IList<RecentPatientRow> _recentPatients = new List<RecentPatientRow>();
+        private ICollectionView? _recentPatientsView;
+        private string _recentPatientsSearchTerm = string.Empty;
 
         public AdminDashboardView()
         {
@@ -49,7 +54,7 @@ namespace Patient_Information_System_CS.Views.Admin
 
         private void PopulatePatientCards()
         {
-            var patients = _dataService.GetAllPatients().ToList();
+                var patients = _dataService.GetAllPatients().ToList();
             var approvedPatients = patients.Count(account => account.PatientProfile?.IsApproved == true);
             var pendingPatients = patients.Count - approvedPatients;
             var admittedPatients = patients.Count(account => account.PatientProfile?.IsCurrentlyAdmitted == true);
@@ -146,29 +151,79 @@ namespace Patient_Information_System_CS.Views.Admin
         private void PopulateRecentPatients()
         {
             var patients = _dataService.GetAllPatients().ToList();
-            var recent = patients.Where(account => account.PatientProfile?.AdmitDate is not null)
-                                 .OrderByDescending(account => account.PatientProfile!.AdmitDate)
-                                 .Take(10)
-                                 .Select(account => new RecentPatientRow
-                                 {
-                                     AdmissionDateDisplay = account.PatientProfile?.AdmitDate?.ToString("MMM dd, yyyy", CultureInfo.CurrentCulture) ?? "-",
-                                     Name = account.DisplayName,
-                                     Contact = string.IsNullOrWhiteSpace(account.PatientProfile?.ContactNumber) ? "-" : account.PatientProfile!.ContactNumber,
-                                     Status = account.PatientProfile?.IsCurrentlyAdmitted == true
-                                         ? "Admitted"
-                                         : account.PatientProfile?.HasUnpaidBills == true ? "Discharged (Pending Bill)" : "Discharged"
-                                 })
-                                 .ToList();
+            _recentPatients = patients.Where(account => account.PatientProfile?.AdmitDate is not null)
+                                       .OrderByDescending(account => account.PatientProfile!.AdmitDate)
+                                       .Take(50)
+                                       .Select(account => new RecentPatientRow
+                                       {
+                                           AdmissionDateDisplay = account.PatientProfile?.AdmitDate?.ToString("MMM dd, yyyy", CultureInfo.CurrentCulture) ?? "-",
+                                           Name = account.DisplayName,
+                                           Contact = string.IsNullOrWhiteSpace(account.PatientProfile?.ContactNumber) ? "-" : account.PatientProfile!.ContactNumber,
+                                           Status = account.PatientProfile?.IsCurrentlyAdmitted == true
+                                               ? "Admitted"
+                                               : account.PatientProfile?.HasUnpaidBills == true ? "Discharged (Pending Bill)" : "Discharged"
+                                       })
+                                       .ToList();
 
-            RecentPatientsGrid.ItemsSource = recent;
+            _recentPatientsView = CollectionViewSource.GetDefaultView(_recentPatients);
+            if (_recentPatientsView is not null)
+            {
+                _recentPatientsView.Filter = RecentPatientsFilter;
+            }
 
-            var totalPatients = patients.Count(account => account.PatientProfile?.AdmitDate is not null);
-            var upperBound = Math.Min(10, totalPatients);
-            RecentPatientsSummaryTextBlock.Text = totalPatients == 0
-                ? "No admissions recorded yet"
-                : totalPatients <= 10
-                    ? FormatCount(totalPatients, "admission listed", "admissions listed")
-                    : $"Showing 1 to {upperBound} of {totalPatients} admissions";
+            RecentPatientsGrid.ItemsSource = _recentPatientsView;
+            ApplyRecentPatientsFilter();
+        }
+
+        private void RecentPatientsSearchTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            _recentPatientsSearchTerm = RecentPatientsSearchTextBox.Text.Trim();
+            ApplyRecentPatientsFilter();
+        }
+
+        private void ApplyRecentPatientsFilter()
+        {
+            _recentPatientsView?.Refresh();
+            UpdateRecentPatientsSummary();
+        }
+
+        private bool RecentPatientsFilter(object item)
+        {
+            if (string.IsNullOrWhiteSpace(_recentPatientsSearchTerm))
+            {
+                return true;
+            }
+
+            if (item is not RecentPatientRow row)
+            {
+                return true;
+            }
+
+            return row.Name.Contains(_recentPatientsSearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                   row.Contact.Contains(_recentPatientsSearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                   row.Status.Contains(_recentPatientsSearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                   row.AdmissionDateDisplay.Contains(_recentPatientsSearchTerm, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void UpdateRecentPatientsSummary()
+        {
+            var total = _recentPatients.Count;
+            if (total == 0)
+            {
+                RecentPatientsSummaryTextBlock.Text = "No admissions recorded yet";
+                return;
+            }
+
+            var filtered = _recentPatientsView?.Cast<RecentPatientRow>().Count() ?? total;
+            if (filtered == total)
+            {
+                RecentPatientsSummaryTextBlock.Text = total <= 10
+                    ? FormatCount(total, "admission listed", "admissions listed")
+                    : $"Showing {filtered} of {total} admissions";
+                return;
+            }
+
+            RecentPatientsSummaryTextBlock.Text = $"Showing {filtered} of {total} admissions";
         }
 
         private static string FormatCount(int count, string singular, string plural)

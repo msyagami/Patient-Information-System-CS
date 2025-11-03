@@ -102,6 +102,11 @@
                                        GroupName="Navigation"
                                        Tag="Doctors"
                                        Click="NavButton_Click"/>
+                            <RadioButton Content="Nurses" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Nurses"
+                                       Click="NavButton_Click"/>
                             <RadioButton Content="Patients" 
                                        Style="{StaticResource NavButtonStyle}"
                                        GroupName="Navigation"
@@ -117,10 +122,20 @@
                                        GroupName="Navigation"
                                        Tag="Appointments"
                                        Click="NavButton_Click"/>
+                            <RadioButton Content="Medical Records" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="MedicalRecords"
+                                       Click="NavButton_Click"/>
                             <RadioButton Content="Billing/Invoice" 
                                        Style="{StaticResource NavButtonStyle}"
                                        GroupName="Navigation"
                                        Tag="Billing/Invoice"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Account" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Account"
                                        Click="NavButton_Click"/>
                         </StackPanel>
 
@@ -142,6 +157,16 @@
                                        GroupName="Navigation"
                                        Tag="Appointments"
                                        Click="NavButton_Click"/>
+                            <RadioButton Content="Medical Records" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="MedicalRecords"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Account" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Account"
+                                       Click="NavButton_Click"/>
                         </StackPanel>
 
                         <!-- Patient Navigation Items -->
@@ -157,6 +182,11 @@
                                        GroupName="Navigation"
                                        Tag="Appointments"
                                        Click="NavButton_Click"/>
+                            <RadioButton Content="Medical Records" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="MedicalRecords"
+                                       Click="NavButton_Click"/>
                             <RadioButton Content="Discharge" 
                                        Style="{StaticResource NavButtonStyle}"
                                        GroupName="Navigation"
@@ -166,6 +196,11 @@
                                        Style="{StaticResource NavButtonStyle}"
                                        GroupName="Navigation"
                                        Tag="Insurance"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Account" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Account"
                                        Click="NavButton_Click"/>
                         </StackPanel>
 
@@ -182,10 +217,20 @@
                                        GroupName="Navigation"
                                        Tag="Admission"
                                        Click="NavButton_Click"/>
+                            <RadioButton Content="Staffs" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Staffs"
+                                       Click="NavButton_Click"/>
                             <RadioButton Content="Doctors" 
                                        Style="{StaticResource NavButtonStyle}"
                                        GroupName="Navigation"
                                        Tag="Doctors"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Nurses" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Nurses"
                                        Click="NavButton_Click"/>
                             <RadioButton Content="Patients" 
                                        Style="{StaticResource NavButtonStyle}"
@@ -202,10 +247,40 @@
                                        GroupName="Navigation"
                                        Tag="Appointments"
                                        Click="NavButton_Click"/>
+                            <RadioButton Content="Medical Records" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="MedicalRecords"
+                                       Click="NavButton_Click"/>
                             <RadioButton Content="Billing/Invoice" 
                                        Style="{StaticResource NavButtonStyle}"
                                        GroupName="Navigation"
                                        Tag="Billing/Invoice"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Account" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Account"
+                                       Click="NavButton_Click"/>
+                        </StackPanel>
+
+                        <!-- Nurse Navigation Items -->
+                        <StackPanel Visibility="{Binding IsNurseRole, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <RadioButton Content="Dashboard" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       IsChecked="True"
+                                       Tag="Dashboard"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Patients" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Patients"
+                                       Click="NavButton_Click"/>
+                            <RadioButton Content="Account" 
+                                       Style="{StaticResource NavButtonStyle}"
+                                       GroupName="Navigation"
+                                       Tag="Account"
                                        Click="NavButton_Click"/>
                         </StackPanel>
 

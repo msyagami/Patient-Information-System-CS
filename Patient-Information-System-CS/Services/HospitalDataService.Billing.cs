@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Patient_Information_System_CS.Data;
@@ -74,6 +75,9 @@ namespace Patient_Information_System_CS.Services
                 ? FormatFullName(doctorPerson)
                 : "Unassigned";
 
+            var breakdown = ParseBillDescription(bill.Description, bill.Amount);
+            var isPaid = IsBillPaid(bill);
+
             return new Patient_Information_System_CS.Models.BillingRecord
             {
                 InvoiceId = bill.BillId,
@@ -88,13 +92,102 @@ namespace Patient_Information_System_CS.Services
                 AdmitDate = bill.DateBilled,
                 ReleaseDate = bill.DateBilled,
                 DaysStayed = 0,
-                RoomCharge = (int)Math.Round(bill.Amount),
-                DoctorFee = 0,
-                MedicineCost = 0,
-                OtherCharge = 0,
-                IsPaid = IsBillPaid(bill),
-                PaidDate = IsBillPaid(bill) ? bill.DateBilled : null
+                RoomCharge = breakdown.RoomCharge,
+                DoctorFee = breakdown.DoctorFee,
+                MedicineCost = breakdown.MedicineCost,
+                OtherCharge = breakdown.OtherCharges,
+                Notes = breakdown.Notes,
+                IsPaid = isPaid,
+                PaidDate = isPaid ? bill.DateBilled : null
             };
+        }
+
+        private static BillBreakdown ParseBillDescription(string? description, decimal totalAmount)
+        {
+            var breakdown = new BillBreakdown();
+
+            if (!string.IsNullOrWhiteSpace(description))
+            {
+                var segments = description.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                var noteSegments = new List<string>();
+
+                foreach (var segment in segments)
+                {
+                    if (TryExtractCharge(segment, "Room", out var room))
+                    {
+                        breakdown.RoomCharge += room;
+                        continue;
+                    }
+
+                    if (TryExtractCharge(segment, "Doctor", out var doctor))
+                    {
+                        breakdown.DoctorFee += doctor;
+                        continue;
+                    }
+
+                    if (TryExtractCharge(segment, "Medicine", out var medicine))
+                    {
+                        breakdown.MedicineCost += medicine;
+                        continue;
+                    }
+
+                    if (TryExtractCharge(segment, "Other", out var other))
+                    {
+                        breakdown.OtherCharges += other;
+                        continue;
+                    }
+
+                    noteSegments.Add(segment.Trim());
+                }
+
+                if (noteSegments.Count > 0)
+                {
+                    breakdown.Notes = string.Join("; ", noteSegments).Trim();
+                }
+            }
+
+            if (!breakdown.HasCharges && totalAmount > 0m)
+            {
+                breakdown.RoomCharge = totalAmount;
+            }
+
+            if (!breakdown.HasCharges && string.IsNullOrWhiteSpace(breakdown.Notes) && !string.IsNullOrWhiteSpace(description))
+            {
+                breakdown.Notes = description.Trim();
+            }
+
+            return breakdown;
+        }
+
+        private static bool TryExtractCharge(string segment, string label, out decimal value)
+        {
+            var prefix = $"{label}:";
+            if (segment.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                var amountPart = segment[prefix.Length..].Trim();
+                if (decimal.TryParse(amountPart, NumberStyles.Currency | NumberStyles.Number, CultureInfo.CurrentCulture, out value))
+                {
+                    return true;
+                }
+
+                if (decimal.TryParse(amountPart, NumberStyles.Currency | NumberStyles.Number, CultureInfo.InvariantCulture, out value))
+                {
+                    return true;
+                }
+            }
+
+            value = 0m;
+            return false;
+        }
+
+        private sealed class BillBreakdown
+        {
+            public decimal RoomCharge { get; set; }
+            public decimal DoctorFee { get; set; }
+            public decimal MedicineCost { get; set; }
+            public decimal OtherCharges { get; set; }
+            public string Notes { get; set; } = string.Empty;
+            public bool HasCharges => RoomCharge > 0m || DoctorFee > 0m || MedicineCost > 0m || OtherCharges > 0m;
         }
 
         private static int? ResolvePatientId(HospitalDbContext context, int userId)

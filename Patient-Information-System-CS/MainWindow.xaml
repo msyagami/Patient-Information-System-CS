@@ -79,9 +79,8 @@
                 <TextBlock Text="Select Portal"
                            FontWeight="Bold"
                            Foreground="#2C3E50"/>
-                <StackPanel Orientation="Horizontal"
-                        Margin="0,12,0,24"
-                        HorizontalAlignment="Center">
+                <WrapPanel Margin="0,12,0,24"
+                       HorizontalAlignment="Center">
                     <RadioButton Content="Admin"
                                  GroupName="Portal"
                                  Style="{StaticResource PortalRadioStyle}"
@@ -95,6 +94,12 @@
                                  Tag="Doctor"
                          Margin="0,0,10,0"
                                  Checked="RoleRadioButton_Checked"/>
+                    <RadioButton Content="Nurse"
+                         GroupName="Portal"
+                         Style="{StaticResource PortalRadioStyle}"
+                         Tag="Nurse"
+                     Margin="0,0,10,0"
+                         Checked="RoleRadioButton_Checked"/>
                     <RadioButton Content="Patient"
                                  GroupName="Portal"
                                  Style="{StaticResource PortalRadioStyle}"
@@ -106,7 +111,7 @@
                                  Style="{StaticResource PortalRadioStyle}"
                                  Tag="Staff"
                                  Checked="RoleRadioButton_Checked"/>
-                </StackPanel>
+                </WrapPanel>
 
                 <StackPanel>
                     <TextBlock Text="Username"
@@ -157,6 +162,7 @@
                             <TextBlock Text="Admin: admin1 / adminpass"
                                        Margin="0,6,0,0"/>
                             <TextBlock Text="Doctor: doc1 / doctorpass"/>
+                            <TextBlock Text="Nurse: nurse1 / nurse123"/>
                             <TextBlock Text="Patient: patient1 / patientpass"/>
                             <TextBlock Text="Staff: staff1 / staffpass"/>
                         </StackPanel>

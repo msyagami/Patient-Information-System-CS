@@ -25,6 +25,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="160"/>
@@ -100,43 +101,68 @@
                    VerticalAlignment="Center"
                    Margin="0,0,12,0"/>
         <ComboBox x:Name="DoctorComboBox"
-                  Grid.Row="7" Grid.Column="1"
-                  DisplayMemberPath="DisplayName"
-                  Margin="0,0,0,12"/>
+              Grid.Row="7" Grid.Column="1"
+              Margin="0,0,0,12">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding DoctorProfile.Department}" FontSize="11" Foreground="#6B7280"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
 
         <TextBlock Grid.Row="8" Grid.Column="0"
+                   Text="Assign nurse"
+                   VerticalAlignment="Center"
+                   Margin="0,0,12,0"/>
+        <ComboBox x:Name="NurseComboBox"
+              Grid.Row="8" Grid.Column="1"
+              Margin="0,0,0,12">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding NurseProfile.Department}" FontSize="11" Foreground="#6B7280"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <TextBlock Grid.Row="9" Grid.Column="0"
                    Text="Insurance"
                    VerticalAlignment="Center"
                    Margin="0,0,12,0"/>
         <TextBox x:Name="InsuranceTextBox"
-                 Grid.Row="8" Grid.Column="1"
-                 Margin="0,0,0,12"/>
-
-        <TextBlock Grid.Row="9" Grid.Column="0"
-                   Text="Emergency contact"
-                   VerticalAlignment="Center"
-                   Margin="0,0,12,0"/>
-        <TextBox x:Name="EmergencyTextBox"
                  Grid.Row="9" Grid.Column="1"
                  Margin="0,0,0,12"/>
 
         <TextBlock Grid.Row="10" Grid.Column="0"
-                   Text="Relationship"
+                   Text="Emergency contact"
                    VerticalAlignment="Center"
                    Margin="0,0,12,0"/>
-        <TextBox x:Name="EmergencyRelationshipTextBox"
+        <TextBox x:Name="EmergencyTextBox"
                  Grid.Row="10" Grid.Column="1"
                  Margin="0,0,0,12"/>
 
         <TextBlock Grid.Row="11" Grid.Column="0"
+                   Text="Relationship"
+                   VerticalAlignment="Center"
+                   Margin="0,0,12,0"/>
+        <TextBox x:Name="EmergencyRelationshipTextBox"
+                 Grid.Row="11" Grid.Column="1"
+                 Margin="0,0,0,12"/>
+
+        <TextBlock Grid.Row="12" Grid.Column="0"
                    Text="Nationality"
                    VerticalAlignment="Center"
                    Margin="0,0,12,0"/>
         <TextBox x:Name="NationalityTextBox"
-                 Grid.Row="11" Grid.Column="1"
+                 Grid.Row="12" Grid.Column="1"
                  Margin="0,0,0,12"/>
 
-        <StackPanel Grid.Row="12" Grid.Column="0"
+        <StackPanel Grid.Row="13" Grid.Column="0"
                     Orientation="Vertical"
                     Margin="0,0,12,0">
             <CheckBox x:Name="ApproveCheckBox"
@@ -147,7 +173,7 @@
                       Checked="CurrentlyAdmittedCheckBox_OnChanged"
                       Unchecked="CurrentlyAdmittedCheckBox_OnChanged"/>
         </StackPanel>
-        <StackPanel Grid.Row="12" Grid.Column="1"
+        <StackPanel Grid.Row="13" Grid.Column="1"
                     Orientation="Vertical"
                     Margin="0,0,0,12">
             <TextBlock Text="Room assignment"
@@ -173,12 +199,12 @@
         </StackPanel>
 
         <TextBlock x:Name="ErrorTextBlock"
-                   Grid.Row="13" Grid.ColumnSpan="2"
+               Grid.Row="14" Grid.ColumnSpan="2"
                    Foreground="#B91C1C"
                    Visibility="Collapsed"
                    Margin="0,0,0,12"/>
 
-        <StackPanel Grid.Row="14" Grid.ColumnSpan="2"
+        <StackPanel Grid.Row="15" Grid.ColumnSpan="2"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right">
             <Button Content="Cancel"

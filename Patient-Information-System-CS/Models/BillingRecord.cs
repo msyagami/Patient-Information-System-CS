@@ -21,15 +21,21 @@ namespace Patient_Information_System_CS.Models
         public DateTime AdmitDate { get; set; } = DateTime.Today;
         public DateTime ReleaseDate { get; set; } = DateTime.Today;
         public int DaysStayed { get; set; }
-        public int RoomCharge { get; set; }
-        public int DoctorFee { get; set; }
-        public int MedicineCost { get; set; }
-        public int OtherCharge { get; set; }
+        public decimal RoomCharge { get; set; }
+        public decimal DoctorFee { get; set; }
+        public decimal MedicineCost { get; set; }
+        public decimal OtherCharge { get; set; }
         public bool IsPaid { get; set; }
         public DateTime? PaidDate { get; set; }
+        [MaxLength(256)]
+        public string Notes { get; set; } = string.Empty;
 
         [NotMapped]
-        public int Total => RoomCharge + DoctorFee + MedicineCost + OtherCharge;
+        public decimal TotalAmount => RoomCharge + DoctorFee + MedicineCost + OtherCharge;
+
+        [NotMapped]
+        public decimal Total => TotalAmount;
+
         [NotMapped]
         public string StatusDisplay => IsPaid ? "Paid" : "Pending";
     }

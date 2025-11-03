@@ -9,13 +9,16 @@ namespace Patient_Information_System_CS.Views.Admin.Dialogs
     public partial class AddPatientWindow : Window
     {
         private readonly IReadOnlyList<UserAccount> _doctors;
+        private readonly IReadOnlyList<UserAccount> _nurses;
         private readonly IReadOnlyList<RoomStatus> _rooms;
 
         public AddPatientWindow(IReadOnlyList<UserAccount> doctors,
+                                IReadOnlyList<UserAccount> nurses,
                                 IReadOnlyList<RoomStatus> rooms)
         {
             InitializeComponent();
             _doctors = doctors;
+            _nurses = nurses;
             _rooms = rooms;
 
             Loaded += OnLoaded;
@@ -27,6 +30,7 @@ namespace Patient_Information_System_CS.Views.Admin.Dialogs
         public string Address => AddressTextBox.Text.Trim();
         public DateTime DateOfBirth => BirthDatePicker.SelectedDate ?? DateTime.Today.AddYears(-30);
         public int? SelectedDoctorId => DoctorComboBox.SelectedItem is UserAccount account ? account.UserId : null;
+        public int? SelectedNurseId => NurseComboBox.SelectedItem is UserAccount account ? account.UserId : null;
         public string InsuranceProvider => InsuranceTextBox.Text.Trim();
         public string EmergencyContact => EmergencyTextBox.Text.Trim();
         public string EmergencyRelationship => EmergencyRelationshipTextBox.Text.Trim();
@@ -41,7 +45,18 @@ namespace Patient_Information_System_CS.Views.Admin.Dialogs
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             DoctorComboBox.ItemsSource = _doctors;
+            NurseComboBox.ItemsSource = _nurses;
             RoomComboBox.ItemsSource = _rooms;
+
+            if (_doctors.Count > 0 && DoctorComboBox.SelectedIndex < 0)
+            {
+                DoctorComboBox.SelectedIndex = 0;
+            }
+
+            if (_nurses.Count == 1)
+            {
+                NurseComboBox.SelectedIndex = 0;
+            }
 
             BirthDatePicker.SelectedDate ??= DateTime.Today.AddYears(-30);
             SexComboBox.SelectedValue = "U";
@@ -65,6 +80,12 @@ namespace Patient_Information_System_CS.Views.Admin.Dialogs
             if (string.IsNullOrWhiteSpace(ContactNumber))
             {
                 ShowError("Contact number is required.");
+                return;
+            }
+
+            if (SelectedDoctorId is null)
+            {
+                ShowError("Please select an attending doctor.");
                 return;
             }
 

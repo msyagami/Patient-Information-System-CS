@@ -91,10 +91,13 @@ namespace Patient_Information_System_CS.Views.Admin
                                                            dialog.Address,
                                                            dialog.EmergencyContact,
                                                            dialog.EmergencyRelationship,
-                                                           dialog.Nationality);
+                                                           dialog.Nationality,
+                                                           dialog.SelectedRole);
 
             RefreshTables();
-            MessageBox.Show($"Staff account for {account.DisplayName} created.",
+
+            var credentialsMessage = $"Staff account for {account.DisplayName} created.\n\nUsername: {account.Username}\nTemporary password: {account.GetPlainTextPassword()}";
+            MessageBox.Show(credentialsMessage,
                             "Staff Added",
                             MessageBoxButton.OK,
                             MessageBoxImage.Information);

@@ -132,6 +132,7 @@ namespace Patient_Information_System_CS.Views.Admin
                 MedicineCostTextBlock.Text = "-";
                 OtherChargeTextBlock.Text = "-";
                 TotalAmountTextBlock.Text = "Total: -";
+                NotesTextBlock.Text = "-";
                 MarkAsPaidButton.Visibility = Visibility.Collapsed;
                 DownloadInvoiceButton.Visibility = Visibility.Collapsed;
                 return;
@@ -161,6 +162,7 @@ namespace Patient_Information_System_CS.Views.Admin
             MedicineCostTextBlock.Text = invoice.MedicineCost.ToString("C");
             OtherChargeTextBlock.Text = invoice.OtherCharge.ToString("C");
             TotalAmountTextBlock.Text = $"Total: {invoice.Total:C}";
+            NotesTextBlock.Text = string.IsNullOrWhiteSpace(invoice.Notes) ? "-" : invoice.Notes;
 
             MarkAsPaidButton.Visibility = invoice.IsPaid ? Visibility.Collapsed : Visibility.Visible;
             DownloadInvoiceButton.Visibility = Visibility.Visible;

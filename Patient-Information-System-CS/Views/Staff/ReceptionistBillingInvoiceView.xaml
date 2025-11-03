@@ -191,6 +191,15 @@
                                 <TextBlock x:Name="OtherChargeTextBlock" Text="-" TextAlignment="Right"/>
                             </UniformGrid>
                             <Separator Margin="0,12"/>
+                            <TextBlock Text="Notes"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,4"/>
+                            <TextBlock x:Name="NotesTextBlock"
+                                       Text="-"
+                                       TextWrapping="Wrap"
+                                       Foreground="#374151"
+                                       Margin="0,0,0,10"/>
+                            <Separator Margin="0,0,0,12"/>
                             <TextBlock x:Name="TotalAmountTextBlock"
                                        Text="Total: -"
                                        FontSize="18"

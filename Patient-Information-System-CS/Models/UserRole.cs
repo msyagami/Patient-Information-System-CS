@@ -4,6 +4,7 @@ namespace Patient_Information_System_CS.Models
     {
         Admin,
         Doctor,
+        Nurse,
         Patient,
         Staff
     }

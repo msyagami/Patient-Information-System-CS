@@ -27,6 +27,7 @@ namespace Patient_Information_System_CS.Services
 
         public event EventHandler? AdmissionsChanged;
         public event EventHandler? AppointmentsChanged;
+        public event EventHandler? MedicalRecordsChanged;
 
         private HospitalDbContext CreateContext(bool tracking = false)
         {
@@ -47,5 +48,7 @@ namespace Patient_Information_System_CS.Services
         private void RaiseAppointmentsChanged() => AppointmentsChanged?.Invoke(this, EventArgs.Empty);
 
         private void RaiseAdmissionsChanged() => AdmissionsChanged?.Invoke(this, EventArgs.Empty);
+
+        private void RaiseMedicalRecordsChanged() => MedicalRecordsChanged?.Invoke(this, EventArgs.Empty);
     }
 }

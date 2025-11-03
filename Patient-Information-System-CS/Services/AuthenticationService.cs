@@ -63,6 +63,17 @@ namespace Patient_Information_System_CS.Services
                     }
                     break;
 
+                case UserRole.Nurse:
+                    if (account.NurseProfile is null)
+                    {
+                        return AuthenticationResult.Failed("Nurse profile is incomplete. Please contact the administrator.");
+                    }
+                    if (account.NurseProfile.Status == NurseStatus.OnHold)
+                    {
+                        return AuthenticationResult.Failed("Your nurse account is awaiting approval.");
+                    }
+                    break;
+
                 case UserRole.Patient:
                     if (account.PatientProfile is null || !account.PatientProfile.IsApproved)
                     {

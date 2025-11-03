@@ -73,11 +73,12 @@ namespace Patient_Information_System_CS.Views.Admin
         private void AddPatientButton_Click(object sender, RoutedEventArgs e)
         {
             var doctors = _dataService.GetActiveDoctors().Concat(_dataService.GetUnavailableDoctors()).ToList();
+            var nurses = _dataService.GetActiveNurses().Concat(_dataService.GetUnavailableNurses()).ToList();
             var availableRooms = _dataService.GetRoomStatuses()
                                              .Where(room => room.AvailableSlots > 0)
                                              .ToList();
 
-            var dialog = new AddPatientWindow(doctors, availableRooms)
+            var dialog = new AddPatientWindow(doctors, nurses, availableRooms)
             {
                 Owner = Window.GetWindow(this)
             };
@@ -95,6 +96,7 @@ namespace Patient_Information_System_CS.Views.Admin
                                                             dialog.ShouldApprove,
                                                             dialog.IsCurrentlyAdmitted,
                                                             dialog.SelectedDoctorId,
+                                                            dialog.SelectedNurseId,
                                                             dialog.InsuranceProvider,
                                                             dialog.EmergencyContact,
                                                             dialog.RoomAssignment,
@@ -103,7 +105,9 @@ namespace Patient_Information_System_CS.Views.Admin
                                                             dialog.Nationality);
 
             RefreshTables();
-            MessageBox.Show($"Patient record for {account.DisplayName} created.",
+
+            var credentialsMessage = $"Patient record for {account.DisplayName} created.\n\nUsername: {account.Username}\nTemporary password: {account.GetPlainTextPassword()}";
+            MessageBox.Show(credentialsMessage,
                             "Patient Added",
                             MessageBoxButton.OK,
                             MessageBoxImage.Information);

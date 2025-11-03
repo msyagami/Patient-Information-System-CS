@@ -1,30 +1,29 @@
 using System;
-using System.Globalization;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Patient_Information_System_CS.Models;
 using Patient_Information_System_CS.Services;
+using Patient_Information_System_CS.Views.Admin.Dialogs;
 
 namespace Patient_Information_System_CS.Views.Staff
 {
     public partial class ReceptionistAdmissionView : UserControl
     {
         private readonly HospitalDataService _dataService = HospitalDataService.Instance;
-        private readonly UserAccount? _staffAccount;
+        private IReadOnlyList<ExistingPatientOption> _existingPatients = Array.Empty<ExistingPatientOption>();
+        private ExistingPatientOption? _selectedExistingPatient;
         private bool _isSubscribed;
-        private int _entriesLimit = 10;
-        private string _searchTerm = string.Empty;
 
-        public ReceptionistAdmissionView(UserAccount? staffAccount)
+        public ReceptionistAdmissionView(UserAccount? _)
         {
-            _staffAccount = staffAccount;
             InitializeComponent();
-            Loaded += OnLoaded;
-            Unloaded += OnUnloaded;
+            Loaded += AdmissionView_Loaded;
+            Unloaded += AdmissionView_Unloaded;
         }
 
-        private void OnLoaded(object sender, RoutedEventArgs e)
+        private void AdmissionView_Loaded(object sender, RoutedEventArgs e)
         {
             if (!_isSubscribed)
             {
@@ -32,13 +31,16 @@ namespace Patient_Information_System_CS.Views.Staff
                 _isSubscribed = true;
             }
 
-            EnsureDefaultFieldValues();
             PopulateDoctors();
+            PopulateNurses();
             PopulateRooms();
-            PopulateActiveAdmissions();
+            LoadExistingPatients();
+            InitializeAdmissionFormDefaults();
+            ClearAdmissionForm();
+            RefreshTables();
         }
 
-        private void OnUnloaded(object sender, RoutedEventArgs e)
+        private void AdmissionView_Unloaded(object sender, RoutedEventArgs e)
         {
             if (_isSubscribed)
             {
@@ -54,57 +56,44 @@ namespace Patient_Information_System_CS.Views.Staff
                 Dispatcher.Invoke(() =>
                 {
                     PopulateDoctors();
+                    PopulateNurses();
                     PopulateRooms();
-                    PopulateActiveAdmissions();
+                    LoadExistingPatients();
+                    RefreshTables();
                 });
                 return;
             }
 
             PopulateDoctors();
+            PopulateNurses();
             PopulateRooms();
-            PopulateActiveAdmissions();
+            LoadExistingPatients();
+            RefreshTables();
         }
 
-        private void EnsureDefaultFieldValues()
+        private void PopulateNurses()
         {
-            if (BirthDatePicker.SelectedDate is null)
-            {
-                BirthDatePicker.SelectedDate = DateTime.Today.AddYears(-30);
-            }
+            var nurses = _dataService.GetAllNurses()
+                .OrderBy(n => n.NurseProfile is { Status: NurseStatus.Available } ? 0 : 1)
+                .ThenBy(n => n.DisplayName)
+                .ToList();
 
-            if (AdmissionDatePicker.SelectedDate is null)
-            {
-                AdmissionDatePicker.SelectedDate = DateTime.Today;
-            }
+            NurseComboBox.ItemsSource = nurses;
+            NurseComboBox.IsEnabled = nurses.Count > 0;
 
-            if (RoomComboBox.SelectedIndex < 0 && RoomComboBox.Items.Count > 0)
+            if (nurses.Count == 0)
             {
-                RoomComboBox.SelectedIndex = 0;
-            }
-
-            if (string.IsNullOrWhiteSpace(InsuranceTextBox.Text))
-            {
-                InsuranceTextBox.Text = "Not Provided";
-            }
-        }
-
-        private void PopulateDoctors()
-        {
-            var doctors = _dataService.GetActiveDoctors().ToList();
-            DoctorComboBox.ItemsSource = doctors;
-
-            if (doctors.Count == 0)
-            {
-                DoctorComboBox.SelectedItem = null;
-                DoctorComboBox.IsEnabled = false;
+                NurseComboBox.SelectedIndex = -1;
                 return;
             }
 
-            DoctorComboBox.IsEnabled = true;
-
-            if (DoctorComboBox.SelectedItem is not UserAccount selected || !doctors.Contains(selected))
+            if (NurseComboBox.SelectedValue is int nurseUserId && nurses.Any(n => n.UserId == nurseUserId))
             {
-                DoctorComboBox.SelectedIndex = 0;
+                NurseComboBox.SelectedValue = nurseUserId;
+            }
+            else
+            {
+                NurseComboBox.SelectedIndex = 0;
             }
         }
 
@@ -119,178 +108,300 @@ namespace Patient_Information_System_CS.Views.Staff
             }
         }
 
-        private void PopulateActiveAdmissions()
+        private void PopulateDoctors()
         {
-            if (!IsLoaded || ActivePatientsDataGrid is null)
+            var doctors = _dataService.GetActiveDoctors().ToList();
+            DoctorComboBox.ItemsSource = doctors;
+
+            if (doctors.Count > 0 && DoctorComboBox.SelectedIndex < 0)
             {
+                DoctorComboBox.SelectedIndex = 0;
+            }
+        }
+
+        private void RefreshTables()
+        {
+            CurrentAdmissionsGrid.ItemsSource = _dataService.GetCurrentAdmissions().ToList();
+            ReactivationGrid.ItemsSource = _dataService.GetDeactivatedPatients().ToList();
+        }
+
+        private void ConfirmAdmissionButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ExistingPatientRadioButton.IsChecked == true)
+            {
+                HandleExistingPatientAdmission();
                 return;
             }
 
-            var rows = _dataService.GetCurrentAdmissions()
-                .Select(CreateActiveRow)
-                .Where(row => string.IsNullOrWhiteSpace(_searchTerm) ||
-                              row.Name.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                              row.PatientNumber.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))
-                .OrderBy(row => row.Name)
-                .ToList();
-
-            var visibleRows = rows.Take(_entriesLimit).ToList();
-
-            ActivePatientsDataGrid.ItemsSource = visibleRows;
-            ActivePatientsEmptyTextBlock.Visibility = rows.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-            ActivePatientsSummaryTextBlock.Text = rows.Count switch
-            {
-                0 => "Showing 0 admissions",
-                _ => $"Showing {visibleRows.Count} of {rows.Count} admissions"
-            };
-        }
-
-        private ActivePatientRow CreateActiveRow(UserAccount account)
-        {
-            var profile = account.PatientProfile!;
-            var doctorName = profile.AssignedDoctorId is int doctorId
-                ? _dataService.GetDoctorById(doctorId)?.DisplayName ?? profile.AssignedDoctorName ?? "Unassigned"
-                : string.IsNullOrWhiteSpace(profile.AssignedDoctorName) ? "Unassigned" : profile.AssignedDoctorName;
-
-            return new ActivePatientRow
-            {
-                Account = account,
-                PatientNumber = profile.PatientNumber,
-                Name = account.DisplayName,
-                AdmitDate = profile.AdmitDate?.ToString("MMM dd, yyyy", CultureInfo.CurrentCulture) ?? "-",
-                Status = profile.IsCurrentlyAdmitted ? "Admitted" : "Inactive",
-                Room = string.IsNullOrWhiteSpace(profile.RoomAssignment) ? "Not assigned" : profile.RoomAssignment,
-                Doctor = doctorName
-            };
-        }
-
-        private void AdmitPatientButton_Click(object sender, RoutedEventArgs e)
-        {
             var fullName = PatientNameTextBox.Text.Trim();
+            var email = EmailTextBox.Text.Trim();
             var dateOfBirth = BirthDatePicker.SelectedDate ?? DateTime.Today.AddYears(-30);
             var contact = ContactTextBox.Text.Trim();
             var address = AddressTextBox.Text.Trim();
-            var emergencyContactName = EmergencyContactTextBox.Text.Trim();
-            var relationship = EmergencyRelationshipTextBox.Text.Trim();
-            var emergencyContact = emergencyContactName;
-            var insurance = string.IsNullOrWhiteSpace(InsuranceTextBox.Text) ? "Not Provided" : InsuranceTextBox.Text.Trim();
-            var doctor = DoctorComboBox.SelectedItem as UserAccount;
+            var emergencyContact = EmergencyContactTextBox.Text.Trim();
+            var emergencyRelationship = EmergencyRelationshipTextBox.Text.Trim();
+            var insurance = InsuranceTextBox.Text.Trim();
             var roomAssignment = GetRoomSelection();
-            var admitDate = AdmissionDatePicker.SelectedDate ?? DateTime.Today;
+            var doctor = DoctorComboBox.SelectedItem as UserAccount;
+            var nurse = NurseComboBox.SelectedItem as UserAccount;
+            var sex = SexComboBox.SelectedValue as string ?? "U";
+            var nationality = string.IsNullOrWhiteSpace(NationalityTextBox.Text) ? "Unknown" : NationalityTextBox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(contact) || string.IsNullOrWhiteSpace(address))
             {
-                MessageBox.Show("Please complete the patient's name, contact number, and address before admitting.",
-                    "Missing Information",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                MessageBox.Show("Please complete the patient's name, contact, and address.", "Missing Information", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(emergencyContact))
-            {
-                MessageBox.Show("Please provide at least one emergency contact.",
-                    "Missing Information",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                return;
-            }
-
-            var newPatient = _dataService.AdmitNewPatient(
-                fullName,
+            var newPatient = _dataService.AdmitNewPatient(fullName,
                 dateOfBirth,
                 contact,
                 address,
                 emergencyContact,
                 insurance,
                 doctor,
+                nurse,
                 roomAssignment,
-                admitDateOverride: admitDate,
-                emergencyRelationship: relationship);
+                email,
+                admitDateOverride: DateTime.Now,
+                sex: sex,
+                emergencyRelationship: string.IsNullOrWhiteSpace(emergencyRelationship) ? "Unknown" : emergencyRelationship,
+                nationality: nationality);
 
             MessageBox.Show(
-                $"{newPatient.DisplayName} is now admitted.\n\nUsername: {newPatient.Username}\nTemporary Password: {newPatient.Password}",
-                "Admission Successful",
+                $"Admission complete for {newPatient.DisplayName}.\n\nUsername: {newPatient.Username}\nTemporary Password: {newPatient.GetPlainTextPassword()}",
+                "Admission Recorded",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
 
             ClearAdmissionForm();
-            PopulateActiveAdmissions();
+            LoadExistingPatients();
+            RefreshTables();
         }
 
-        private void DischargePatientButton_Click(object sender, RoutedEventArgs e)
+        private void DischargePatient_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is not Button { CommandParameter: UserAccount patient })
+            if (sender is not Button { DataContext: UserAccount patient })
             {
                 return;
             }
 
-            _dataService.DischargePatient(patient);
+            var dialog = new DischargeBillingWindow
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            if (dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            var billingRequest = dialog.BuildRequest(patient.UserId);
+            var invoice = _dataService.DischargePatient(patient, billingRequest);
+            RefreshTables();
 
             MessageBox.Show(
-                $"{patient.DisplayName} has been marked for discharge and billing.",
-                "Discharge Initiated",
+                $"{patient.DisplayName} has been discharged. Total charges recorded: {invoice.TotalAmount:C}.",
+                "Discharge Complete",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
         }
 
-        private void EntriesComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ReactivatePatient_Click(object sender, RoutedEventArgs e)
         {
-            if (EntriesComboBox.SelectedItem is ComboBoxItem { Content: string content } && int.TryParse(content, out var limit))
+            if (sender is not Button { DataContext: UserAccount patient })
             {
-                _entriesLimit = limit;
-            }
-            else
-            {
-                _entriesLimit = 10;
+                return;
             }
 
-            PopulateActiveAdmissions();
+            _dataService.ReactivatePatient(patient);
+            RefreshTables();
+
+            MessageBox.Show(
+                $"{patient.DisplayName} has been reactivated and readmitted.",
+                "Patient Reactivated",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
         }
 
-        private void SearchTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
+        private string GetRoomSelection()
         {
-            _searchTerm = SearchTextBox.Text.Trim();
-            PopulateActiveAdmissions();
+            if (RoomComboBox.SelectedItem is RoomOption room)
+            {
+                return room.DisplayLabel;
+            }
+
+            return RoomComboBox.Text switch
+            {
+                { Length: > 0 } text => text,
+                _ => "Room 101 - General Ward"
+            };
         }
 
         private void ClearAdmissionForm()
         {
             PatientNameTextBox.Clear();
+            EmailTextBox.Clear();
             BirthDatePicker.SelectedDate = DateTime.Today.AddYears(-30);
             ContactTextBox.Clear();
             AddressTextBox.Clear();
             EmergencyContactTextBox.Clear();
             EmergencyRelationshipTextBox.Clear();
-            InsuranceTextBox.Text = "Not Provided";
-            AdmissionDatePicker.SelectedDate = DateTime.Today;
+            InsuranceTextBox.Text = "No Insurance";
+            NationalityTextBox.Text = "PH";
+            SexComboBox.SelectedValue = "U";
             if (RoomComboBox.Items.Count > 0)
             {
                 RoomComboBox.SelectedIndex = 0;
             }
 
             PopulateDoctors();
+            PopulateNurses();
         }
 
-        private string GetRoomSelection()
+        private void LoadExistingPatients()
         {
-            return RoomComboBox.SelectedItem switch
+            _existingPatients = _dataService.GetExistingPatientOptions();
+            ExistingPatientComboBox.ItemsSource = _existingPatients;
+            ExistingPatientComboBox.SelectedIndex = -1;
+            ExistingPatientInfoTextBlock.Text = _existingPatients.Count == 0
+                ? "No patient records are available yet."
+                : string.Empty;
+        }
+
+        private void InitializeAdmissionFormDefaults()
+        {
+            SexComboBox.SelectedValue = "U";
+            NationalityTextBox.Text = "PH";
+            NewPatientRadioButton.IsChecked = true;
+        }
+
+        private void AdmissionModeRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (!IsLoaded)
             {
-                RoomOption room => room.DisplayLabel,
-                _ when !string.IsNullOrWhiteSpace(RoomComboBox.Text) => RoomComboBox.Text,
-                _ => "Room 101 - General Ward"
-            };
+                return;
+            }
+
+            UpdateAdmissionMode();
         }
 
-        private sealed class ActivePatientRow
+        private void UpdateAdmissionMode()
         {
-            public UserAccount Account { get; set; } = null!;
-            public string PatientNumber { get; set; } = string.Empty;
-            public string Name { get; set; } = string.Empty;
-            public string AdmitDate { get; set; } = string.Empty;
-            public string Status { get; set; } = string.Empty;
-            public string Room { get; set; } = string.Empty;
-            public string Doctor { get; set; } = string.Empty;
+            if (ExistingPatientSelectorPanel is null || ExistingPatientRadioButton is null)
+            {
+                return;
+            }
+
+            var useExisting = ExistingPatientRadioButton.IsChecked == true;
+            ExistingPatientSelectorPanel.Visibility = useExisting ? Visibility.Visible : Visibility.Collapsed;
+
+            if (!useExisting)
+            {
+                _selectedExistingPatient = null;
+                ExistingPatientComboBox.SelectedIndex = -1;
+                ExistingPatientInfoTextBlock.Text = string.Empty;
+                InitializeAdmissionFormDefaults();
+                ClearAdmissionForm();
+            }
+        }
+
+        private void ExistingPatientComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ExistingPatientComboBox.SelectedItem is ExistingPatientOption option)
+            {
+                _selectedExistingPatient = option;
+                PopulateExistingPatientDetails(option);
+            }
+        }
+
+        private void PopulateExistingPatientDetails(ExistingPatientOption option)
+        {
+            var account = _dataService.GetAccountById(option.UserId);
+            if (account?.PatientProfile is null)
+            {
+                ExistingPatientInfoTextBlock.Text = "Unable to load patient details.";
+                return;
+            }
+
+            PatientNameTextBox.Text = account.DisplayName;
+            EmailTextBox.Text = account.Email;
+            BirthDatePicker.SelectedDate = account.PatientProfile.DateOfBirth;
+            ContactTextBox.Text = account.PatientProfile.ContactNumber;
+            AddressTextBox.Text = account.PatientProfile.Address;
+            EmergencyContactTextBox.Text = account.PatientProfile.EmergencyContact;
+            EmergencyRelationshipTextBox.Text = account.PatientProfile.EmergencyRelationship;
+            InsuranceTextBox.Text = account.PatientProfile.InsuranceProvider;
+            NationalityTextBox.Text = account.PatientProfile.Nationality;
+            SexComboBox.SelectedValue = string.IsNullOrWhiteSpace(account.PatientProfile.Sex) ? "U" : account.PatientProfile.Sex;
+
+            if (account.PatientProfile.AssignedNurseId.HasValue && NurseComboBox.ItemsSource is IEnumerable<UserAccount> nurseSource)
+            {
+                var assignedNurseId = account.PatientProfile.AssignedNurseId.Value;
+                var nurses = nurseSource.ToList();
+                var assignedNurse = nurses.FirstOrDefault(n => n.NurseProfile?.NurseId == assignedNurseId)
+                    ?? _dataService.GetAllNurses().FirstOrDefault(n => n.NurseProfile?.NurseId == assignedNurseId);
+
+                if (assignedNurse is null)
+                {
+                    NurseComboBox.SelectedIndex = -1;
+                }
+                else
+                {
+                    if (nurses.All(n => n.UserId != assignedNurse.UserId))
+                    {
+                        nurses.Add(assignedNurse);
+                        NurseComboBox.ItemsSource = nurses
+                            .OrderBy(n => n.NurseProfile is { Status: NurseStatus.Available } ? 0 : 1)
+                            .ThenBy(n => n.DisplayName)
+                            .ToList();
+                    }
+
+                    NurseComboBox.SelectedValue = assignedNurse.UserId;
+                }
+            }
+            else
+            {
+                NurseComboBox.SelectedIndex = -1;
+            }
+
+            ExistingPatientInfoTextBlock.Text = option.IsCurrentlyAdmitted
+                ? "This patient is already admitted."
+                : $"Patient number {option.PatientNumber} • {option.ContactNumber}";
+        }
+
+        private void HandleExistingPatientAdmission()
+        {
+            if (_selectedExistingPatient is null)
+            {
+                MessageBox.Show("Select an existing patient record before continuing.", "No Patient Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var doctor = DoctorComboBox.SelectedItem as UserAccount;
+            var nurse = NurseComboBox.SelectedItem as UserAccount;
+            var request = new ExistingPatientAdmissionRequest
+            {
+                UserId = _selectedExistingPatient.UserId,
+                AssignedDoctorUserId = doctor?.UserId,
+                AssignedNurseUserId = nurse?.UserId,
+                RoomAssignment = GetRoomSelection(),
+                AdmitDateOverride = DateTime.Now,
+                ContactNumber = ContactTextBox.Text.Trim(),
+                Address = AddressTextBox.Text.Trim(),
+                EmergencyContact = EmergencyContactTextBox.Text.Trim(),
+                EmergencyRelationship = EmergencyRelationshipTextBox.Text.Trim(),
+                InsuranceProvider = InsuranceTextBox.Text.Trim()
+            };
+
+            var updatedAccount = _dataService.ReadmitExistingPatient(request);
+            RefreshTables();
+
+            MessageBox.Show(
+                $"{updatedAccount.DisplayName} has been readmitted successfully.",
+                "Admission Recorded",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
         }
     }
 }

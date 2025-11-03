@@ -1,16 +1,18 @@
-<Window x:Class="Patient_Information_System_CS.Views.Admin.Dialogs.AddStaffWindow"
+<Window x:Class="Patient_Information_System_CS.Views.Admin.Dialogs.AddNurseWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
-        xmlns:models="clr-namespace:Patient_Information_System_CS.Models"
-        Title="Add Staff Account"
+        Title="Register Nurse"
         WindowStartupLocation="CenterOwner"
         SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
         Background="White"
-        MinWidth="460">
-    <Grid Margin="24">
+        MinWidth="520">
+    <Grid Margin="26">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -27,71 +29,79 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150"/>
-            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="300"/>
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
-                   Text="Provide the details for the new staff member"
+                   Text="Enter the nurse profile details"
                    FontSize="16"
                    FontWeight="Bold"
-                   Margin="0,0,0,18"
-                   Foreground="#2C3E50"/>
+                   Margin="0,0,0,20"
+                   Foreground="#1F2937"/>
 
         <TextBlock Grid.Row="1" Grid.Column="0"
                    Text="Full name"
                    VerticalAlignment="Center"
-                   Margin="0,0,16,0"/>
+                   Margin="0,0,12,0"/>
         <TextBox x:Name="FullNameTextBox"
                  Grid.Row="1" Grid.Column="1"
-                 MinWidth="240"
                  Margin="0,0,0,12"/>
 
         <TextBlock Grid.Row="2" Grid.Column="0"
                    Text="Email"
                    VerticalAlignment="Center"
-                   Margin="0,0,16,0"/>
+                   Margin="0,0,12,0"/>
         <TextBox x:Name="EmailTextBox"
                  Grid.Row="2" Grid.Column="1"
                  Margin="0,0,0,12"/>
 
         <TextBlock Grid.Row="3" Grid.Column="0"
-                   Text="Contact number"
-                   VerticalAlignment="Top"
-                   Margin="0,0,16,0"/>
-        <StackPanel Grid.Row="3" Grid.Column="1"
-                    Margin="0,0,0,12">
-            <TextBox x:Name="ContactTextBox" Margin="0,0,0,8"/>
-            <CheckBox x:Name="ApproveCheckBox"
-                      Content="Mark as approved"/>
-        </StackPanel>
+                   Text="Department"
+                   VerticalAlignment="Center"
+                   Margin="0,0,12,0"/>
+        <TextBox x:Name="DepartmentTextBox"
+                 Grid.Row="3" Grid.Column="1"
+                 Margin="0,0,0,12"/>
 
         <TextBlock Grid.Row="4" Grid.Column="0"
-                   Text="Role"
+                   Text="Specialization"
                    VerticalAlignment="Center"
-                   Margin="0,0,16,0"/>
-        <ComboBox x:Name="RoleComboBox"
-                  Grid.Row="4" Grid.Column="1"
-                  SelectedValuePath="Tag"
-                  Margin="0,0,0,12">
-            <ComboBoxItem Content="Administrator" Tag="{x:Static models:UserRole.Admin}"/>
-            <ComboBoxItem Content="Regular staff" Tag="{x:Static models:UserRole.Staff}"/>
-        </ComboBox>
+                   Margin="0,0,12,0"/>
+        <TextBox x:Name="SpecializationTextBox"
+                 Grid.Row="4" Grid.Column="1"
+                 Margin="0,0,0,12"/>
 
         <TextBlock Grid.Row="5" Grid.Column="0"
+                   Text="License #"
+                   VerticalAlignment="Center"
+                   Margin="0,0,12,0"/>
+        <TextBox x:Name="LicenseTextBox"
+                 Grid.Row="5" Grid.Column="1"
+                 Margin="0,0,0,12"/>
+
+        <TextBlock Grid.Row="6" Grid.Column="0"
+                   Text="Contact"
+                   VerticalAlignment="Center"
+                   Margin="0,0,12,0"/>
+        <TextBox x:Name="ContactTextBox"
+                 Grid.Row="6" Grid.Column="1"
+                 Margin="0,0,0,12"/>
+
+        <TextBlock Grid.Row="7" Grid.Column="0"
                    Text="Birth date"
                    VerticalAlignment="Center"
-                   Margin="0,0,16,0"/>
+                   Margin="0,0,12,0"/>
         <DatePicker x:Name="BirthDatePicker"
-                    Grid.Row="5" Grid.Column="1"
+                    Grid.Row="7" Grid.Column="1"
                     SelectedDate="{x:Static System:DateTime.Today}"
                     Margin="0,0,0,12"/>
 
-        <TextBlock Grid.Row="6" Grid.Column="0"
+        <TextBlock Grid.Row="8" Grid.Column="0"
                    Text="Sex"
                    VerticalAlignment="Center"
-                   Margin="0,0,16,0"/>
+                   Margin="0,0,12,0"/>
         <ComboBox x:Name="SexComboBox"
-                  Grid.Row="6" Grid.Column="1"
+                  Grid.Row="8" Grid.Column="1"
                   SelectedValuePath="Tag"
                   Margin="0,0,0,12">
             <ComboBoxItem Content="Female" Tag="F"/>
@@ -99,58 +109,68 @@
             <ComboBoxItem Content="Unspecified" Tag="U"/>
         </ComboBox>
 
-        <TextBlock Grid.Row="7" Grid.Column="0"
+        <TextBlock Grid.Row="9" Grid.Column="0"
                    Text="Address"
                    VerticalAlignment="Top"
-                   Margin="0,0,16,0"/>
+                   Margin="0,4,12,0"/>
         <TextBox x:Name="AddressTextBox"
-                 Grid.Row="7" Grid.Column="1"
-                 Height="70"
-                 AcceptsReturn="True"
-                 TextWrapping="Wrap"
-                 Margin="0,0,0,12"/>
-
-        <TextBlock Grid.Row="8" Grid.Column="0"
-                   Text="Emergency contact"
-                   VerticalAlignment="Center"
-                   Margin="0,0,16,0"/>
-        <TextBox x:Name="EmergencyContactTextBox"
-                 Grid.Row="8" Grid.Column="1"
-                 Margin="0,0,0,12"/>
-
-        <TextBlock Grid.Row="9" Grid.Column="0"
-                   Text="Relationship"
-                   VerticalAlignment="Center"
-                   Margin="0,0,16,0"/>
-        <TextBox x:Name="EmergencyRelationshipTextBox"
                  Grid.Row="9" Grid.Column="1"
-                 Margin="0,0,0,12"/>
+                 Margin="0,0,0,12"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 Height="70"/>
 
         <TextBlock Grid.Row="10" Grid.Column="0"
-                   Text="Nationality"
+                   Text="Emergency contact"
                    VerticalAlignment="Center"
-                   Margin="0,0,16,0"/>
-        <TextBox x:Name="NationalityTextBox"
+                   Margin="0,4,12,0"/>
+        <TextBox x:Name="EmergencyContactTextBox"
                  Grid.Row="10" Grid.Column="1"
                  Margin="0,0,0,12"/>
 
+        <TextBlock Grid.Row="11" Grid.Column="0"
+                   Text="Relationship"
+                   VerticalAlignment="Center"
+                   Margin="0,4,12,0"/>
+        <TextBox x:Name="EmergencyRelationshipTextBox"
+                 Grid.Row="11" Grid.Column="1"
+                 Margin="0,0,0,12"/>
+
+        <TextBlock Grid.Row="12" Grid.Column="0"
+                   Text="Nationality"
+                   VerticalAlignment="Center"
+                   Margin="0,4,12,0"/>
+        <TextBox x:Name="NationalityTextBox"
+                 Grid.Row="12" Grid.Column="1"
+                 Margin="0,0,0,12"/>
+
+        <StackPanel Grid.Row="13" Grid.Column="0"
+                    Orientation="Horizontal"
+                    Margin="0,4,12,0"
+                    VerticalAlignment="Center">
+            <TextBlock Text="Status"/>
+        </StackPanel>
+        <ComboBox x:Name="StatusComboBox"
+                  Grid.Row="13" Grid.Column="1"
+                  Margin="0,0,0,18"
+                  MinWidth="200"/>
+
         <TextBlock x:Name="ErrorTextBlock"
-                   Grid.Row="11" Grid.ColumnSpan="2"
+                   Grid.Row="14" Grid.ColumnSpan="2"
                    Foreground="#B91C1C"
                    Visibility="Collapsed"
                    Margin="0,0,0,12"/>
 
-        <StackPanel Grid.Row="12" Grid.ColumnSpan="2"
+        <StackPanel Grid.Row="15" Grid.ColumnSpan="2"
                     Orientation="Horizontal"
-                    HorizontalAlignment="Right"
-                    Margin="0,12,0,0">
+                    HorizontalAlignment="Right">
             <Button Content="Cancel"
-                    Width="90"
-                    Margin="0,0,8,0"
+                    Width="100"
+                    Margin="0,0,10,0"
                     Click="CancelButton_Click"/>
             <Button Content="Save"
-                    Width="90"
-                    Background="#28A745"
+                    Width="100"
+                    Background="#2563EB"
                     Foreground="White"
                     BorderThickness="0"
                     Click="SaveButton_Click"/>

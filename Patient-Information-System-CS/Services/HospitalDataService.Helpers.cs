@@ -191,6 +191,40 @@ namespace Patient_Information_System_CS.Services
             _ => 0
         };
 
+        private static NurseStatus MapNurseStatus(EntityNurse? nurse)
+        {
+            if (nurse is null)
+            {
+                return NurseStatus.OnHold;
+            }
+
+            if (nurse.RegularStaff)
+            {
+                return NurseStatus.Available;
+            }
+
+            return nurse.ResidencyDate.HasValue ? NurseStatus.NotAvailable : NurseStatus.OnHold;
+        }
+
+        private static void ApplyNurseStatus(EntityNurse nurse, NurseStatus status)
+        {
+            switch (status)
+            {
+                case NurseStatus.Available:
+                    nurse.RegularStaff = true;
+                    nurse.ResidencyDate = null;
+                    break;
+                case NurseStatus.NotAvailable:
+                    nurse.RegularStaff = false;
+                    nurse.ResidencyDate = DateOnly.FromDateTime(DateTime.Today);
+                    break;
+                default:
+                    nurse.RegularStaff = false;
+                    nurse.ResidencyDate = null;
+                    break;
+            }
+        }
+
         private static AppointmentStatus MapAppointmentStatus(byte value) => value switch
         {
             1 => AppointmentStatus.Accepted,
@@ -211,6 +245,7 @@ namespace Patient_Information_System_CS.Services
         {
             "admin" => UserRole.Admin,
             "doctor" => UserRole.Doctor,
+            "nurse" => UserRole.Nurse,
             "staff" => UserRole.Staff,
             _ => UserRole.Patient
         };
@@ -247,11 +282,98 @@ namespace Patient_Information_System_CS.Services
         private static int NextDepartmentId(HospitalDbContext context) =>
             context.Departments.Any() ? context.Departments.Max(d => d.DepartmentId) + 1 : 1;
 
-        private static int ResolveFallbackDoctor(HospitalDbContext context) =>
-            context.Doctors.Select(d => d.DoctorId).OrderBy(id => id).FirstOrDefault();
+        private static int NextMedicalRecordId(HospitalDbContext context) =>
+            context.MedicalRecords.Any() ? context.MedicalRecords.Max(r => r.RecordId) + 1 : 1;
 
-        private static int ResolveFallbackPatient(HospitalDbContext context) =>
-            context.Patients.Select(p => p.PatientId).OrderBy(id => id).FirstOrDefault();
+        private static string GenerateMedicalRecordNumber(HospitalDbContext context)
+        {
+            var existing = context.MedicalRecords
+                .Select(r => r.RecordIdNumber)
+                .Where(number => !string.IsNullOrWhiteSpace(number))
+                .ToList();
+
+            var next = existing
+                .Select(ParseMedicalRecordNumber)
+                .DefaultIfEmpty(1000)
+                .Max() + 1;
+
+            return $"MR-{next:D5}";
+        }
+
+        private static int ParseMedicalRecordNumber(string? recordNumber)
+        {
+            if (string.IsNullOrWhiteSpace(recordNumber))
+            {
+                return 1000;
+            }
+
+            var digits = new string(recordNumber.Where(char.IsDigit).ToArray());
+            return int.TryParse(digits, NumberStyles.Integer, CultureInfo.InvariantCulture, out var numeric)
+                ? numeric
+                : 1000;
+        }
+
+        private static int ResolveFallbackDoctor(HospitalDbContext context)
+        {
+            var fallback = context.Doctors
+                .Select(d => d.DoctorId)
+                .OrderBy(id => id)
+                .FirstOrDefault();
+
+            if (fallback == 0)
+            {
+                throw new InvalidOperationException("No doctors are defined in the database. Please seed the Doctor table before scheduling appointments.");
+            }
+
+            return fallback;
+        }
+
+        private static int ResolveFallbackPatient(HospitalDbContext context)
+        {
+            var fallback = context.Patients
+                .Select(p => p.PatientId)
+                .OrderBy(id => id)
+                .FirstOrDefault();
+
+            if (fallback == 0)
+            {
+                throw new InvalidOperationException("No patients are defined in the database. Please create a patient record before scheduling appointments.");
+            }
+
+            return fallback;
+        }
+
+        private static int? NormalizeDoctorId(HospitalDbContext context, int? doctorIdOrUserId)
+        {
+            if (!doctorIdOrUserId.HasValue || doctorIdOrUserId.Value <= 0)
+            {
+                return null;
+            }
+
+            var candidate = doctorIdOrUserId.Value;
+            if (context.Doctors.Any(d => d.DoctorId == candidate))
+            {
+                return candidate;
+            }
+
+            return ResolveDoctorId(context, candidate);
+        }
+
+        private static int? NormalizePatientId(HospitalDbContext context, int? patientIdOrUserId)
+        {
+            if (!patientIdOrUserId.HasValue || patientIdOrUserId.Value <= 0)
+            {
+                return null;
+            }
+
+            var candidate = patientIdOrUserId.Value;
+            if (context.Patients.Any(p => p.PatientId == candidate))
+            {
+                return candidate;
+            }
+
+            return ResolvePatientId(context, candidate);
+        }
 
         private static int? ResolveDoctorId(HospitalDbContext context, int? userId)
         {
@@ -269,8 +391,31 @@ namespace Patient_Information_System_CS.Services
             return doctor?.AssociatedPerson?.Doctors.FirstOrDefault()?.DoctorId;
         }
 
-        private static int? ResolveFallbackNurse(HospitalDbContext context) =>
-            context.Nurses.Select(n => n.NurseId).OrderBy(id => id).FirstOrDefault();
+        private static int? ResolveFallbackNurse(HospitalDbContext context)
+        {
+            var fallback = context.Nurses
+                .Select(n => n.NurseId)
+                .OrderBy(id => id)
+                .FirstOrDefault();
+
+            return fallback == 0 ? null : fallback;
+        }
+
+        private static int? ResolveNurseId(HospitalDbContext context, int? userId)
+        {
+            if (userId is null)
+            {
+                return null;
+            }
+
+            var nurse = context.Users
+                .Include(u => u.AssociatedPerson)
+                    .ThenInclude(p => p.Nurses)
+                .AsNoTracking()
+                .SingleOrDefault(u => u.UserId == userId);
+
+            return nurse?.AssociatedPerson?.Nurses.FirstOrDefault()?.NurseId;
+        }
 
         private static EntityRoom ResolveRoom(HospitalDbContext context, string roomAssignment)
         {

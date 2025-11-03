@@ -107,7 +107,9 @@ namespace Patient_Information_System_CS.Views.Admin
                                                            dialog.Nationality);
 
             RefreshTables();
-            MessageBox.Show($"Doctor account for {account.DisplayName} created.",
+
+            var credentialsMessage = $"Doctor account for {account.DisplayName} created.\n\nUsername: {account.Username}\nTemporary password: {account.GetPlainTextPassword()}";
+            MessageBox.Show(credentialsMessage,
                             "Doctor Added",
                             MessageBoxButton.OK,
                             MessageBoxImage.Information);

@@ -264,7 +264,10 @@
 
                             <StackPanel Grid.Column="2" Orientation="Horizontal">
                                 <TextBlock Text="Search: " VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                <TextBox Width="250" Padding="5"/>
+                                <TextBox x:Name="RecentPatientsSearchTextBox"
+                                         Width="250"
+                                         Padding="5"
+                                         TextChanged="RecentPatientsSearchTextBox_OnTextChanged"/>
                             </StackPanel>
                         </Grid>
 
