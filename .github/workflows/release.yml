@@ -1,0 +1,71 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Tag to release (leave empty when triggered by tagged push)"
+        required: false
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Determine tag name
+        id: tag
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF -like "refs/tags/*") {
+            $tag = $env:GITHUB_REF -replace "refs/tags/", ""
+          } elseif ('${{ github.event.inputs.tag_name }}'.Trim().Length -gt 0) {
+            $tag = '${{ github.event.inputs.tag_name }}'
+          } else {
+            Write-Error "No tag name provided. Supply one when running workflow_dispatch."
+          }
+          "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore Patient-Information-System-CS/Patient-Information-System-CS.sln
+
+      - name: Build solution (Release)
+        run: dotnet build Patient-Information-System-CS/Patient-Information-System-CS.sln --configuration Release --no-restore
+
+      - name: Run unit tests
+        run: dotnet test Tests/HospitalDataService.Tests/HospitalDataService.Tests.csproj --configuration Release --no-build
+
+      - name: Run smoke tests
+        run: dotnet run --project SmokeTests/SmokeTests.csproj --configuration Release
+
+      - name: Publish release artifacts
+        run: dotnet publish Patient-Information-System-CS/Patient-Information-System-CS/Patient-Information-System-CS.csproj --configuration Release --output build/publish
+
+      - name: Package artifacts
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path build -Force | Out-Null
+          $zipPath = Join-Path build "PatientInformationSystem-${{ steps.tag.outputs.tag }}.zip"
+          if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
+          Compress-Archive -Path build/publish/* -DestinationPath $zipPath
+
+      - name: Create GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag.outputs.tag }}
+          name: Patient Information System ${{ steps.tag.outputs.tag }}
+          artifacts: build/PatientInformationSystem-${{ steps.tag.outputs.tag }}.zip
+          body: |
+            Automated release build for ${{ steps.tag.outputs.tag }}.
+          allowUpdates: true
