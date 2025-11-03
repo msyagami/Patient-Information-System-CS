@@ -9,6 +9,10 @@ on:
       tag_name:
         description: "Optional release tag name"
         required: false
+      run_smoke_tests:
+        description: "Set to true to execute smoke tests"
+        required: false
+        default: "false"
 
 jobs:
   build-and-release:
@@ -53,7 +57,12 @@ jobs:
         run: dotnet test Tests/HospitalDataService.Tests/HospitalDataService.Tests.csproj --configuration Release --no-build
 
       - name: Run smoke tests
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.run_smoke_tests == 'true'
         run: dotnet run --project SmokeTests/SmokeTests.csproj --configuration Release
+
+      - name: Skip smoke tests
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.run_smoke_tests != 'true'
+        run: echo "Smoke tests skipped (no database connection available)."
 
       - name: Publish release artifacts
         run: dotnet publish Patient-Information-System-CS/Patient-Information-System-CS.csproj --configuration Release --output build/publish
